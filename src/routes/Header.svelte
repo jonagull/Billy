@@ -35,7 +35,7 @@
     </nav>
 
     <div class="corner">
-        <a href="https://github.com/jonagull/pool-elo">
+        <a href="https://github.com/jonagull/pool-elo" target="_blank">
             <img src={github} alt="GitHub" />
         </a>
     </div>
