@@ -1,0 +1,40 @@
+﻿<Properties StartupConfiguration="{413FC630-B3DF-4AA5-83BB-FDB96F6FD974}|https">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Billy-BE/Models/TodoContext.cs">
+    <Files>
+      <File FileName="Billy-BE/WeatherForecast.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Billy-BE/Properties/launchSettings.json" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Billy-BE/Controllers/WeatherForecastController.cs" NotebookId="1" />
+      <File FileName="Billy-BE/Models/TodoApi.cs" Line="1" Column="1" NotebookId="1" />
+      <File FileName="Billy-BE/Models/TodoContext.cs" Line="15" Column="1" NotebookId="1" />
+    </Files>
+    <FloatingWindows>
+      <FloatingWindow WindowId="1" X="3703" Y="93" Width="2719" Height="1322">
+        <Files>
+          <File FileName="Billy-BE/Program.cs" Line="32" Column="1" />
+          <File FileName="Billy-BE/appsettings.json" Line="1" Column="1" />
+        </Files>
+      </FloatingWindow>
+    </FloatingWindows>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Billy-BE" expanded="True">
+            <Node name="Billy-BE" expanded="True">
+              <Node name="Dependencies" expanded="True" />
+              <Node name="Models" expanded="True">
+                <Node name="TodoContext.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.ItemProperties.Billy-BE PreferredExecutionTarget="/Applications/Firefox Developer Edition.app" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MultiItemStartupConfigurations />
+</Properties>
