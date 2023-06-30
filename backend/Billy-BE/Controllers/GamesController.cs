@@ -22,13 +22,15 @@ namespace Billy_BE.Controllers
             {
                 // Find the players involved in the game by their IDs
                 Player? playerOne = _context.Players.Find(game.PlayerOneId);
-
                 Player? playerTwo = _context.Players.Find(game.PlayerTwoId);
 
                 if (playerOne == null || playerTwo == null)
                 {
                     return NotFound("One or both players not found");
                 }
+
+                playerOne.GamesPlayed++;
+                playerTwo.GamesPlayed++;
 
                 // Update the players' Elo ratings based on the game outcome
                 UpdateEloRatings(playerOne, playerTwo, game.WinnerId);
@@ -64,6 +66,8 @@ namespace Billy_BE.Controllers
                 playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
                 playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
             }
+            Console.WriteLine(playerOneExpectedScore);
+            Console.WriteLine(playerTwoExpectedScore);
         }
     }
 }
