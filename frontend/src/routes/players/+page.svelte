@@ -14,7 +14,7 @@
     function addPlayer() {
         const playerData = {
             name: playerName,
-            rating: 1200,
+            rating: 1500,
             gamesPlayed: 0,
         };
 

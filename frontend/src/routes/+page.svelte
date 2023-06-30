@@ -1,44 +1,52 @@
-<!-- App.svelte -->
 <script>
     import Feed from "$lib/images/components/Feed.svelte";
+    import man from "$lib/images/assets/man.png";
 </script>
 
-<main>
-    <div class="welcome">
-        <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Cegal-black-logo.svg/2560px-Cegal-black-logo.svg.png"
-            alt=""
-            width="300px"
-        />
-        <h2>Welcome to Billy</h2>
-        <p>
-            Are you ready to showcase your skills and compete against the best?
-            Billy empowers you to keep track your progress and compare you
-            internally to you colleagues and playing partners!
-        </p>
-        <a href="/players">
-            <button class="cta-button">Get Started</button>
-        </a>
+<section>
+    <div
+        class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12"
+    >
+        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+            <img src={man} alt="man playing pool" />
+        </div>
+        <div class="mr-auto place-self-center lg:col-span-7">
+            <h1
+                class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white"
+            >
+                Billy's pool
+            </h1>
+            <p
+                class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400"
+            >
+                You dare challenge me?!
+            </p>
+            <a
+                href="/game"
+                class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
+            >
+                Play game
+                <svg
+                    class="w-5 h-5 ml-2 -mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    ><path
+                        fill-rule="evenodd"
+                        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                    /></svg
+                >
+            </a>
+        </div>
     </div>
-</main>
+</section>
 
 <Feed />
 
 <style>
-    main {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: calc(100vh - 80px);
-    }
-
-    .welcome {
-        text-align: center;
-    }
-
-    h2 {
-        font-size: 32px;
-        margin-bottom: 20px;
+    * {
+        color: black;
     }
 
     p {
@@ -56,9 +64,5 @@
         border-radius: 4px;
         transition: background-color 0.3s ease;
         cursor: pointer;
-    }
-
-    .cta-button:hover {
-        background-color: #555;
     }
 </style>
