@@ -10,11 +10,11 @@
             alt=""
             width="300px"
         />
-        <h2>Join the Excitement</h2>
+        <h2>Welcome to Billy</h2>
         <p>
             Are you ready to showcase your skills and compete against the best?
-            Dive into our thrilling Pool League and embark on a journey of
-            cuesports excellence.
+            Billy empowers you to keep track your progress and compare you
+            internally to you colleagues and playing partners!
         </p>
         <a href="/players">
             <button class="cta-button">Get Started</button>
