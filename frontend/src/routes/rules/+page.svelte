@@ -168,12 +168,12 @@
 
         <p class="mb-4">
             I spillet 8-ball pool, <strong class="eightball"
-                >"ball in hand"</strong
-            > refererer til en situasjon der en spiller har friheten til å plassere
-            køballen hvor som helst på bordet før de tar skuddet sitt. Imidlertid
-            kan de spesifikke reglene angående hvor spilleren kan plassere køballen
-            etter en "ball in hand"-situasjon variere avhengig av regelsettet som
-            følges.
+                >"ball in hand" refererer til en situasjon der en spiller har
+                friheten til å plassere køballen hvor som helst på bordet før de
+                tar skuddet sitt.
+            </strong> Imidlertid kan de spesifikke reglene angående hvor spilleren
+            kan plassere køballen etter en "ball in hand"-situasjon variere avhengig
+            av regelsettet som følges.
         </p>
 
         <p class="mb-4">
