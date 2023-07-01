@@ -16,6 +16,7 @@
             name: playerName,
             rating: 1500,
             gamesPlayed: 0,
+            dateCreated: new Date().toISOString(),
         };
 
         fetch("http://localhost:5219/api/Players", {
@@ -110,6 +111,30 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
+                    Wins
+                </th>
+                <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                    Losses
+                </th>
+                <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                    Winrate
+                </th>
+                <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                    Creation Date
+                </th>
+                <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                     Actions
                 </th>
             </tr>
@@ -139,6 +164,38 @@
                             name="input"
                             class="border-none"
                             bind:value={player.gamesPlayed}
+                        />
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            bind:value={player.wins}
+                        />
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            bind:value={player.losses}
+                        />
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            bind:value={player.winrate}
+                        />
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            bind:value={player.dateCreated}
                         />
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">

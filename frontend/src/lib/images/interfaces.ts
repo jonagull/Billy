@@ -3,6 +3,10 @@ export interface Player {
     name: string;
     rating: number;
     gamesPlayed: number;
+    dateCreated: number;
+    wins: number;
+    losses: number;
+    winrate: number;
 }
 
 export interface GamePlayed {

@@ -42,8 +42,6 @@
         const playerId = +event.target.value;
         winnerId = playerId;
 
-        console.log(playerId);
-
         selectedPlayerTwo = players.find(
             (player) => player.id === selectedPlayerTwoId
         );
