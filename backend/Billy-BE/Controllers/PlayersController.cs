@@ -24,10 +24,6 @@ namespace Billy_BE.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
         {
-          if (_context.Players == null)
-          {
-              return NotFound();
-          }
             return await _context.Players.ToListAsync();
         }
 
@@ -35,10 +31,6 @@ namespace Billy_BE.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Player>> GetPlayer(int id)
         {
-          if (_context.Players == null)
-          {
-              return NotFound();
-          }
             var player = await _context.Players.FindAsync(id);
 
             if (player == null)
@@ -85,10 +77,6 @@ namespace Billy_BE.Controllers
         [HttpPost]
         public async Task<ActionResult<Player>> PostPlayer(Player player)
         {
-          if (_context.Players == null)
-          {
-              return Problem("Entity set 'PlayerContext.Players'  is null.");
-          }
             _context.Players.Add(player);
             await _context.SaveChangesAsync();
 
@@ -99,10 +87,6 @@ namespace Billy_BE.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePlayer(int id)
         {
-            if (_context.Players == null)
-            {
-                return NotFound();
-            }
             var player = await _context.Players.FindAsync(id);
             if (player == null)
             {
