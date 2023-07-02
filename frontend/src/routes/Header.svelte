@@ -1,6 +1,6 @@
 <script>
     import { page } from "$app/stores";
-    import github from "$lib/images/github.svg";
+    import github from "$lib/assets/github.svg";
 </script>
 
 <header>
