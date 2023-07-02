@@ -1,7 +1,8 @@
+#FRONTEND
 .DS_Store
 node_modules
 /build
-/.svelte-kit
+frontend/.svelte-kit
 /package
 .env
 .env.*
@@ -10,3 +11,6 @@ node_modules
 .output
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+#BACKEND
+backend/Billy-BE/obj
