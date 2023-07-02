@@ -11,6 +11,12 @@
         getPlayers();
     });
 
+    function formatDateTime(dateTimeString: string | number | Date) {
+        const dateTime = new Date(dateTimeString);
+        const options = { day: "numeric", month: "numeric", year: "numeric" };
+        return dateTime.toLocaleDateString(undefined, options);
+    }
+
     function addPlayer() {
         const playerData = {
             name: playerName,
@@ -86,54 +92,54 @@
     </div>
 
     <h2 class="text-2xl font-bold mb-2">Players</h2>
-    <table class="min-w-full divide-y divide-gray-200">
+    <table class="table-auto min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="w-40 px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Name
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Rating
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Games Played
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Wins
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Losses
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Winrate
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Creation Date
                 </th>
                 <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Actions
                 </th>
@@ -142,63 +148,63 @@
         <tbody class="bg-white divide-y divide-gray-200">
             {#each players as player (player.id)}
                 <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.name}
+                            value={player.name}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.rating}
+                            value={player.rating}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.gamesPlayed}
+                            value={player.gamesPlayed}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.wins}
+                            value={player.wins}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.losses}
+                            value={player.losses}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.winrate}
+                            value={player.winrate + "%"}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
                             class="border-none"
-                            bind:value={player.dateCreated}
+                            value={formatDateTime(player.dateCreated)}
                         />
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="px-4 py-2 tespace-nowrap">
                         <Button
                             on:click={() => removePlayer(player.id)}
                             type="danger"

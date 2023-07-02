@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Player } from "$lib/images/interfaces";
     import { onMount } from "svelte";
-    import poolSticks from "$lib/images/assets/poolbattle.png";
+    import poolSticks from "$lib/assets/poolbattle.png";
 
     let winnerId: number | undefined;
     let timeOfPlay = new Date().toISOString();

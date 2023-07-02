@@ -1,6 +1,6 @@
 <script>
-    import Feed from "$lib/images/components/Feed.svelte";
-    import man from "$lib/images/assets/man.png";
+    import Feed from "$lib/components/Feed.svelte";
+    import man from "$lib/assets/man.png";
 </script>
 
 <section>
