@@ -1,7 +1,0 @@
-{
-	"/": [
-		"src/routes/+page.ts"
-	],
-	"/about": [],
-	"/players": []
-}
