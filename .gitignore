@@ -14,3 +14,4 @@ vite.config.ts.timestamp-*
 
 #BACKEND
 backend/Billy-BE/obj
+backend/Billy-BE/bin
