@@ -5,7 +5,7 @@ module.exports = {
         {
             name: "Billy-FE",
             script: "npm",
-            args: "run dev",
+            args: "run live",
             cwd: "./frontend",
         },
         // This works only if youve built the backend project beforehand
