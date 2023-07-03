@@ -4,21 +4,16 @@ namespace Billy_BE.Models;
 
 public class GamePlayedContext : DbContext
 {
-    protected readonly IConfiguration Configuration;
-
-    // public GamePlayedContext (DbContextOptions<GamePlayedContext > options)
-    //     : base(options)
-    // {
-    // }
+    private readonly IConfiguration _configuration;
+    
     public GamePlayedContext(IConfiguration configuration)
     {
-        Configuration = configuration;
+        _configuration = configuration;
     }
     
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        // connect to sqlite database
-        options.UseSqlite(Configuration.GetConnectionString("WebApiDatabase"));
+        options.UseSqlite(_configuration.GetConnectionString("WebApiDatabase"));
     }
 
     public DbSet<GamePlayed> GamesPlayed { get; set; } = null!;
