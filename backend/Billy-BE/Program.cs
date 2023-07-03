@@ -11,11 +11,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configure SQLite database
 builder.Services.AddDbContext<PlayerContext>(opt =>
-    opt.UseInMemoryDatabase("PlayerList"));
+    opt.UseSqlite("Data Source=data.db")); // Specify the SQLite database file path
+    // For local development uncomment the following line to use an in-memory database
+    // opt.UseInMemoryDatabase("PlayerList"));
 
 builder.Services.AddDbContext<GamePlayedContext>(opt =>
-    opt.UseInMemoryDatabase("GamesPlayedList"));
+    opt.UseSqlite("Data Source=data.db")); // Specify the SQLite database file path
+    // For local development uncomment the following line to use an in-memory database
+    // opt.UseInMemoryDatabase("GamesPlayedList"));
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
