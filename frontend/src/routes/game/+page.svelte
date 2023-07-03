@@ -120,7 +120,6 @@
                     >Player One:</label
                 >
                 <select
-                    id="playerOneSelect"
                     class="form-select block w-full p-2 border border-gray-300 rounded"
                     bind:value={selectedPlayerOneId}
                     on:change={handlePlayerOneSelect}
@@ -139,7 +138,6 @@
                     >Player Two:</label
                 >
                 <select
-                    id="playerTwoSelect"
                     class="form-select block w-full p-2 border border-gray-300 rounded"
                     bind:value={selectedPlayerTwoId}
                     on:change={handlePlayerTwoSelect}

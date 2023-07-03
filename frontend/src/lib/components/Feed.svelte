@@ -16,31 +16,31 @@
         {
             avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
             content:
-                '<span>Played a match against <a href="#player1" class="font-bold">Front End Developer</a> and won</span>',
+                "<span>Played a match against Front End Developer and won</span>",
             date: new Date(2022, 8, 21),
         },
         {
             icon: currency_usd,
             content:
-                '<span>Challenged by <a href="#player2" class="font-bold">Bethany Blake</a> for a match and emerged victorious</span>',
+                "<span>Challenged by Bethany Blake for a match and emerged victorious</span>",
             date: new Date(2022, 8, 19),
         },
         {
             icon: check,
             content:
-                '<span>Competed in a match with <a href="#player3" class="font-bold">Martha Gardner</a> and emerged as the winner</span>',
+                "<span>Competed in a match with Martha Gardner and emerged as the winner</span>",
             date: new Date(2022, 8, 15),
         },
         {
             icon: currency_usd,
             content:
-                '<span>Accepted the challenge from <a href="#player4" class="font-bold">Bethany Blake</a> and won the match</span>',
+                "<span>Accepted the challenge from Bethany Blake and won the match</span>",
             date: new Date(2022, 8, 2),
         },
         {
             icon: check,
             content:
-                '<span>Played a match against <a href="#player5" class="font-bold">Katherine Snyder</a> and emerged victorious</span>',
+                "<span>Played a match against Katherine Snyder and emerged victorious</span>",
             date: new Date(2022, 7, 22),
         },
     ];
