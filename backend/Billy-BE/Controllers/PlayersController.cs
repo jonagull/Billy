@@ -77,11 +77,20 @@ namespace Billy_BE.Controllers
         [HttpPost]
         public async Task<ActionResult<Player>> PostPlayer(Player player)
         {
+            // Check if the player with the same name already exists in the database
+            if (_context.Players.Any(p => p.Name == player.Name))
+            {
+                ModelState.AddModelError("Name", "Player with this name already exists.");
+                return BadRequest(ModelState);
+            }
+
+            // Player does not exist, add it to the database
             _context.Players.Add(player);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPlayer", new { id = player.Id }, player);
         }
+
 
         // DELETE: api/Players/5
         [HttpDelete("{id}")]

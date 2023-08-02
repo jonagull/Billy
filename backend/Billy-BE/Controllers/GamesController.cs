@@ -35,9 +35,31 @@ namespace Billy_BE.Controllers
                 UpdateEloRatings(playerOne, playerTwo, game.WinnerId);
                 // Save changes to the database
                 _context.SaveChanges();
+                
+                
+                int playerOneRatingDiff = playerOne.Rating - game.PlayerOneElo;
+                int playerTwoRatingDiff = playerTwo.Rating - game.PlayerTwoElo;
 
-                return Ok("Game logged successfully");
+                // Create a response object containing the updated player objects and rating differences
+                var response = new
+                {
+                    PlayerOne = new
+                    {
+                        NewRating = playerOne.Rating,
+                        RatingDiff = playerOneRatingDiff
+                    },
+                    PlayerTwo = new
+                    {
+                        NewRating = playerTwo.Rating,
+                        RatingDiff = playerTwoRatingDiff
+                    }
+                };
+
+                // Return the response as JSON
+                return Ok(response);
             }
+            
+            
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
@@ -73,22 +95,21 @@ namespace Billy_BE.Controllers
 
             if (playerTwo == null) return;
 
-            if (playerOne != null)
-            {
-                double playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
-                double playerTwoExpectedScore = 1 - playerOneExpectedScore;
+            if (playerOne == null) return;
+            
+            double playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
+            double playerTwoExpectedScore = 1 - playerOneExpectedScore;
 
-                // Update Elo ratings based on the winner
-                if (winnerId == playerOne.Id)
-                {
-                    playerOne.Rating += (int)(K * (1 - playerOneExpectedScore));
-                    playerTwo.Rating += (int)(K * (0 - playerTwoExpectedScore));
-                }
-                else if (winnerId == playerTwo.Id)
-                {
-                    playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
-                    playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
-                }
+            // Update Elo ratings based on the winner
+            if (winnerId == playerOne.Id)
+            {
+                playerOne.Rating += (int)(K * (1 - playerOneExpectedScore));
+                playerTwo.Rating += (int)(K * (0 - playerTwoExpectedScore));
+            }
+            else if (winnerId == playerTwo.Id)
+            {
+                playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
+                playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
             }
         }
     }
