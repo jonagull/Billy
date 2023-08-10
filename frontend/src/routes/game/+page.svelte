@@ -1,7 +1,8 @@
 <script lang="ts">
-    import type { Player } from "$lib/images/interfaces";
     import { onMount } from "svelte";
     import poolSticks from "$lib/assets/poolbattle.png";
+    import type { Player } from "$lib/interfaces";
+    import { baseUrl } from "$lib/constants";
 
     let winnerId: number | undefined;
     let timeOfPlay = new Date().toISOString();
@@ -11,6 +12,8 @@
     let selectedPlayerTwoId: number | undefined;
     let selectedPlayerTwo: Player | undefined;
     let availablePlayers: Player[] = [];
+    let playerOneRatingChange: number;
+    let playerTwoRatingChange: number;
 
     onMount(() => {
         fetchPlayers();
@@ -56,7 +59,7 @@
 
     async function fetchPlayers() {
         try {
-            const response = await fetch("http://localhost:5219/api/Players");
+            const response = await fetch(baseUrl + "/Players");
             if (response.ok) {
                 players = await response.json();
             } else {
@@ -81,7 +84,7 @@
             timeOfPlay: timeOfPlay,
         };
         try {
-            const response = await fetch("http://localhost:5219/api/Games", {
+            const response = await fetch(baseUrl + "/Games", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,7 +95,12 @@
 
             if (response.ok) {
                 // Handle successful response
-                console.log("Game submitted successfully!");
+                selectedPlayerOneId = undefined;
+                selectedPlayerTwoId = undefined;
+                winnerId = undefined;
+                const data = await response.json();
+                playerOneRatingChange = data.playerOne.ratingDiff;
+                playerTwoRatingChange = data.playerTwo.ratingDiff;
             } else {
                 // Handle error response
                 console.error("Failed to submit game.");
@@ -190,8 +198,23 @@
                         <h2 class="text-2xl font-bold mb-4">
                             {selectedPlayerOne.name}
                         </h2>
+                        <span class="flex">
+                            <p>
+                                Elo: {selectedPlayerOne.rating}
+                            </p>
+                            {#if playerOneRatingChange}
+                                <p
+                                    class={playerOneRatingChange > 0
+                                        ? "green-text"
+                                        : "red-text"}
+                                >
+                                    {playerOneRatingChange > 0 ? " +" : " "}
+                                    {playerOneRatingChange}
+                                </p>
+                            {/if}
+                        </span>
                         <p>
-                            Elo: {selectedPlayerOne.rating} | Games played: {selectedPlayerOne.gamesPlayed}
+                            Games played: {selectedPlayerOne.gamesPlayed}
                         </p>
                     </div>
                 {/if}
@@ -215,8 +238,25 @@
                         <h2 class="text-2xl font-bold mb-4">
                             {selectedPlayerTwo.name}
                         </h2>
+                        <span class="flex">
+                            <p>
+                                Elo: {selectedPlayerTwo.rating}
+                            </p>
+                            {#if playerTwoRatingChange}
+                                <p
+                                    class={playerTwoRatingChange > 0
+                                        ? "green-text"
+                                        : "red-text"}
+                                >
+                                    {playerTwoRatingChange > 0
+                                        ? "" + " +"
+                                        : " "}
+                                    {playerTwoRatingChange}
+                                </p>
+                            {/if}
+                        </span>
                         <p>
-                            Elo: {selectedPlayerTwo.rating} | Games played: {selectedPlayerTwo.gamesPlayed}
+                            Games played: {selectedPlayerTwo.gamesPlayed}
                         </p>
                     </div>
                 {/if}
@@ -224,3 +264,13 @@
         </div>
     </div>
 </main>
+
+<style>
+    .green-text {
+        color: #629924;
+    }
+
+    .red-text {
+        color: #cc3333;
+    }
+</style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { baseUrl } from "$lib/constants";
     import type { Player } from "$lib/images/interfaces";
     import { Input } from "stwui";
     import { Button } from "stwui";
@@ -25,7 +26,7 @@
             dateCreated: new Date().toISOString(),
         };
 
-        fetch("http://localhost:5219/api/Players", {
+        fetch(baseUrl + "/Players", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -51,7 +52,7 @@
 
     async function getPlayers() {
         try {
-            const response = await fetch("http://localhost:5219/api/Players");
+            const response = await fetch(baseUrl + "/Players");
             if (response.ok) {
                 players = await response.json();
             } else {
@@ -64,12 +65,9 @@
 
     async function removePlayer(id: number) {
         try {
-            const response = await fetch(
-                `http://localhost:5219/api/Players/${id}`,
-                {
-                    method: "DELETE",
-                }
-            );
+            const response = await fetch(`${baseUrl}/Players/${id}`, {
+                method: "DELETE",
+            });
 
             if (response.ok) {
                 getPlayers();
