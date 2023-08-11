@@ -1,5 +1,7 @@
+using Billy_BE.DTOs;
 using Billy_BE.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Billy_BE.Controllers
 {
@@ -7,35 +9,69 @@ namespace Billy_BE.Controllers
     [Route("api/[controller]")]
     public class GamesController : ControllerBase
     {
-        private readonly PlayerContext _context;
+        private readonly BillyContext _billyContext;
 
-        public GamesController(PlayerContext context)
+        public GamesController(BillyContext billyContext)
         {
-            _context = context;
+            _billyContext = billyContext;
+        }
+
+        [HttpGet]
+        public IActionResult GetAllGamesPlayed()
+        {
+            try
+            {
+                var gamesPlayed= _billyContext.GamesPlayed
+                    .Include(game => game.PlayerOne)
+                    .Include(game => game.PlayerTwo)
+                    .Include(game => game.Winner)
+                    .ToList();
+
+                var gamesWithNames = gamesPlayed.Select(game => new
+                {
+                    game.Id,
+                    PlayerOneName = game.PlayerOne.Name,
+                    PlayerTwoName = game.PlayerTwo.Name,
+                    WinnerName = game.Winner.Name,
+                    TimeOfPlay = game.TimeOfPlay.AddHours(2)
+                }).ToList();
+
+                return Ok(gamesWithNames);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
         [HttpPost]
-        public IActionResult LogGame(GamePlayed game)
+        public async Task<IActionResult> LogGame(GamePlayedDto gameDto)
         {
             // Perform validation and error handling as needed
             try
             {
                 // Find the players involved in the game by their IDs
-                Player? playerOne = _context.Players.Find(game.PlayerOneId);
-                Player? playerTwo = _context.Players.Find(game.PlayerTwoId);
+                var playerOne = await _billyContext.Players.FindAsync(gameDto.PlayerOneId);
+                var playerTwo = await _billyContext.Players.FindAsync(gameDto.PlayerTwoId);
 
                 if (playerOne == null || playerTwo == null)
                 {
                     return NotFound("One or both players not found");
                 }
 
+                var game = new GamePlayed(
+                    playerOne,
+                    playerTwo,
+                    gameDto.WinnerId == gameDto.PlayerOneId ? playerOne : playerTwo);
 
-                UpdatePlayerMetrics(playerOne, playerTwo, game.WinnerId);
+                UpdatePlayerMetrics(playerOne, playerTwo, gameDto.WinnerId);
                 // Update the players' Elo ratings based on the game outcome
-                UpdateEloRatings(playerOne, playerTwo, game.WinnerId);
+                UpdateEloRatings(playerOne, playerTwo, gameDto.WinnerId);
                 // Save changes to the database
-                _context.SaveChanges();
+                await _billyContext.SaveChangesAsync();
                 
+                _billyContext.Add(game);
+                await _billyContext.SaveChangesAsync();
                 
                 int playerOneRatingDiff = playerOne.Rating - game.PlayerOneElo;
                 int playerTwoRatingDiff = playerTwo.Rating - game.PlayerTwoElo;
@@ -96,10 +132,9 @@ namespace Billy_BE.Controllers
             if (playerTwo == null) return;
 
             if (playerOne == null) return;
-            
-            double playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
-            double playerTwoExpectedScore = 1 - playerOneExpectedScore;
-
+            var playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
+            var playerTwoExpectedScore = 1 - playerOneExpectedScore;
+           
             // Update Elo ratings based on the winner
             if (winnerId == playerOne.Id)
             {

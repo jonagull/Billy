@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Billy_BE.Models;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Billy_BE.Controllers
 {
@@ -13,9 +9,9 @@ namespace Billy_BE.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
-        private readonly PlayerContext _context;
+        private readonly BillyContext _context;
 
-        public PlayersController(PlayerContext context)
+        public PlayersController(BillyContext context)
         {
             _context = context;
         }
@@ -77,6 +73,14 @@ namespace Billy_BE.Controllers
         [HttpPost]
         public async Task<ActionResult<Player>> PostPlayer(Player player)
         {
+
+            if (player.Name.IsNullOrEmpty() || player.Name == " ")
+            {
+                ModelState.AddModelError("Name", "Player must have a name!");
+                return BadRequest(ModelState);
+            }
+            
+            
             // Check if the player with the same name already exists in the database
             if (_context.Players.Any(p => p.Name == player.Name))
             {

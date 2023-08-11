@@ -2,11 +2,30 @@ namespace Billy_BE.Models;
 
 public class GamePlayed
 {
-    public int Id { get; set; }
-    public int PlayerOneId { get; set; }
-    public int PlayerOneElo { get; set; }
-    public int PlayerTwoId { get; set; }
-    public int PlayerTwoElo { get; set; }
-    public int WinnerId { get; set; }
-    public DateTime TimeOfPlay { get; set; }
+    public int Id { get; private set; }
+    public int PlayerOneElo { get; private set; }
+    public int PlayerTwoElo { get; private set;  }
+    public DateTime TimeOfPlay { get; private set;  }
+    public Player PlayerOne { get; private set; }
+    public Player PlayerTwo { get; private set; }
+    public Player Winner { get; private set;  }
+
+    private GamePlayed()
+    {
+        
+    }
+    public GamePlayed(Player playerOne, Player playerTwo, Player winner)
+    {
+        if (winner != playerOne && winner != playerTwo)
+        {
+            throw new ArgumentException("Winner must be one of the players", nameof(winner));
+        }
+
+        TimeOfPlay = DateTime.UtcNow;
+        PlayerOne = playerOne;
+        PlayerTwo = playerTwo;
+        Winner = winner;
+        PlayerOneElo = playerOne.Rating;
+        PlayerTwoElo = playerTwo.Rating;
+    }
 }

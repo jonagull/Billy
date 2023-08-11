@@ -12,23 +12,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure SQLite database
-builder.Services.AddDbContext<PlayerContext>(opt =>
-    opt.UseSqlite("Data Source=data.db")); // Specify the SQLite database file path
-    // For local development uncomment the following line to use an in-memory database
-    // opt.UseInMemoryDatabase("PlayerList"));
-
-builder.Services.AddDbContext<GamePlayedContext>(opt =>
+builder.Services.AddDbContext<BillyContext>(opt =>
     opt.UseSqlite("Data Source=data.db")); // Specify the SQLite database file path
     // For local development uncomment the following line to use an in-memory database
     // opt.UseInMemoryDatabase("GamesPlayedList"));
 
 var app = builder.Build();
+
+// Migrate database
+await using var scope = app.Services.CreateAsyncScope();
+await using var db = scope.ServiceProvider.GetRequiredService<BillyContext>();
+await db.Database.MigrateAsync();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
+
 
 app.UseHttpsRedirection();
 app.UseRouting(); // Add routing middleware
