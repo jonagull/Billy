@@ -1,6 +1,8 @@
-<script>
-    import Feed from "$lib/components/Feed.svelte";
+<script lang="ts">
     import man from "$lib/assets/man.png";
+    import type { PageData } from "./$types";
+
+    export let data: PageData;
 </script>
 
 <section>
@@ -12,12 +14,12 @@
         </div>
         <div class="mr-auto place-self-center lg:col-span-7">
             <h1
-                class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white"
+                class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl"
             >
                 Billy's pool
             </h1>
             <p
-                class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400"
+                class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl"
             >
                 You dare challenge me?!
             </p>
@@ -44,11 +46,36 @@
             </a>
         </div>
     </div>
+
+    <div class="feed">
+        {#each data.gamesPlayed as game}
+            <div class="game">
+                <p>
+                    #{game.id} -
+
+                    {game.winnerName} slo {game.winnerName ===
+                    game.playerOneName
+                        ? game.playerTwoName
+                        : game.playerOneName} |
+                    {new Date(game.timeOfPlay).toLocaleString("en-US", {
+                        timeZone: "Europe/Oslo",
+                    })}
+                </p>
+            </div>
+        {/each}
+    </div>
 </section>
 
-<!-- <Feed /> -->
-
 <style>
+    .feed {
+        margin: 0 150px;
+        padding: 50px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid black;
+        border-radius: 20px;
+    }
     * {
         color: black;
     }

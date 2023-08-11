@@ -11,9 +11,6 @@ export interface Player {
 
 export interface GamePlayed {
     playerOneId: number;
-    playerOneElo: number;
     playerTwoId: number;
-    playerTwoElo: number;
     winnerId: number;
-    timeOfPlay: Date;
 }

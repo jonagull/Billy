@@ -77,11 +77,8 @@
 
         const game = {
             playerOneId: selectedPlayerOneId,
-            playerOneElo: selectedPlayerOne?.rating,
             playerTwoId: selectedPlayerTwoId,
-            playerTwoElo: selectedPlayerTwo?.rating,
             winnerId: winnerId,
-            timeOfPlay: timeOfPlay,
         };
         try {
             const response = await fetch(baseUrl + "/Games", {
