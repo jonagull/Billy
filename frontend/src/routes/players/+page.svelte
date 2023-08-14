@@ -135,12 +135,12 @@
                 >
                     Creation Date
                 </th>
-                <th
+                <!-- <th
                     scope="col"
                     class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                     Actions
-                </th>
+                </th> -->
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -202,7 +202,7 @@
                             value={formatDateTime(player.dateCreated)}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <!-- <td class="px-4 py-2 tespace-nowrap">
                         <Button
                             on:click={() => removePlayer(player.id)}
                             type="danger"
@@ -210,7 +210,7 @@
                         >
                             Remove
                         </Button>
-                    </td>
+                    </td> -->
                 </tr>
             {/each}
         </tbody>
