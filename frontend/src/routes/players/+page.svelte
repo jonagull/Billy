@@ -89,7 +89,7 @@
         <Button on:click={addPlayer} type="primary">Add</Button>
     </div>
 
-    <h2 class="text-2xl font-bold mb-2">Players</h2>
+    <h2 class="title text-2xl font-bold mb-2">Players</h2>
     <table class="table-auto min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
@@ -216,3 +216,17 @@
         </tbody>
     </table>
 </main>
+
+<style>
+    table {
+        margin-left: -50px;
+    }
+
+    .title {
+        margin-left: -50px;
+    }
+
+    input {
+        width: 100px;
+    }
+</style>
