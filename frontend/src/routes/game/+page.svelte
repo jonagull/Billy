@@ -62,6 +62,7 @@
             const response = await fetch(baseUrl + "/Players");
             if (response.ok) {
                 players = await response.json();
+                players.sort((a, b) => a.name.localeCompare(b.name));
             } else {
                 console.error("Failed to fetch players.");
             }
