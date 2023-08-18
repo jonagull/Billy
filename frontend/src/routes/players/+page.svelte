@@ -55,6 +55,7 @@
             const response = await fetch(baseUrl + "/Players");
             if (response.ok) {
                 players = await response.json();
+                players.sort((a, b) => b.rating - a.rating);
             } else {
                 console.error("Failed to retrieve players");
             }
