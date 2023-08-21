@@ -29,11 +29,11 @@
                 <a href="/players">Players</a>
             </li>
             <li
-                aria-current={$page.url.pathname === "/about"
+                aria-current={$page.url.pathname === "/feed"
                     ? "page"
                     : undefined}
             >
-                <a href="/about">About</a>
+                <a href="/feed">Feed</a>
             </li>
             <li
                 aria-current={$page.url.pathname === "/rules"
