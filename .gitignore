@@ -18,5 +18,7 @@ backend/Billy-BE/obj
 backend/Billy-BE/bin
 backend/Billy-BE/Billy-BE.csproj
 backend/Billy-BE/data.db
+backend/Billy-BE/data.db*
 backend/.idea
+
 

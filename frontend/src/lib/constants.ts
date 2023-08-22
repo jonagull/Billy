@@ -1,2 +1,1 @@
-export const baseUrl = "https://www.billypool.no/api";
-// export const baseUrl = "http://localhost:5219/api";
+export const baseUrl = import.meta.env.VITE_API_URL;
