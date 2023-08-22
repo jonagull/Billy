@@ -1,8 +1,10 @@
 <script lang="ts">
     import man from "$lib/assets/man.png";
+    import { quotes } from "$lib/data/quotes";
     import type { PageData } from "./$types";
 
     export let data: PageData;
+    let randomIndex = Math.floor(Math.random() * quotes.length);
 </script>
 
 <section>
@@ -12,23 +14,27 @@
         <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
             <img src={man} alt="man playing pool" />
         </div>
-        <div class="mr-auto place-self-center lg:col-span-7">
+
+        <div class="flex flex-col mr-auto place-self-center lg:col-span-7">
             <h1
-                class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl"
+                class="place-self-start max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl"
             >
-                Billy's pool
+                Billy
             </h1>
+            <p class="max-w-2xl font-light text-gray-500">
+                {quotes[randomIndex].quote}
+            </p>
             <p
-                class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl"
+                class="place-self-end max-w-2xl mb-2 mr-2 font-light text-gray-500"
             >
-                You dare challenge me?!
+                - {quotes[randomIndex].author}
             </p>
             <a
                 href="/game"
-                class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
+                class="inline-flex items-center justify-start py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
             >
                 <button
-                    class="flex bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                    class="flex bg-transparent hover:bg-black font-semibold hover:text-white py-2 px-4 border border-black hover:border-transparent rounded"
                 >
                     Play game
                     <svg
@@ -71,9 +77,9 @@
             </div>
         {/each}
         <button
-            class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+            class="flex bg-transparent hover:bg-black font-semibold py-2 px-4 border border-black hover:border-transparent rounded"
         >
-            <a href="/feed">See more</a>
+            <a href="/feed" class="hover:text-white">See more</a>
         </button>
     </div>
 </section>
