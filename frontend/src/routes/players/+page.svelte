@@ -42,6 +42,7 @@
                     console.log("Player added successfully");
                     playerName = ""; // Reset the player name
                     await getPlayers();
+                    closeModal();
                 } else {
                     console.error("Failed to add player");
                 }
@@ -96,14 +97,6 @@
 </script>
 
 <main>
-    <h1>Players</h1>
-
-    <!-- <div class="flex mb-20">
-        <Input name="input" placeholder="Name" bind:value={playerName} />
-
-        <Button on:click={addPlayer} type="primary">Add</Button>
-    </div> -->
-
     <Button class="mb-5" type="primary" on:click={openModal}>Add player</Button>
 
     <Portal>
@@ -176,14 +169,8 @@
                     scope="col"
                     class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                    Creation Date
+                    Created
                 </th>
-                <!-- <th
-                    scope="col"
-                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                    Actions
-                </th> -->
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">

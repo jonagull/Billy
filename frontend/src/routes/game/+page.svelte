@@ -131,8 +131,6 @@
 
 <main>
     <div class="flex flex-col items-center">
-        <h1 class="mb-10">Submit Game</h1>
-
         <img src={poolSticks} alt="Pool sticks in cross" width="200px" />
 
         <form
