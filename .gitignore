@@ -11,7 +11,12 @@ frontend/.svelte-kit
 .output
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+.vscode
 
 #BACKEND
 backend/Billy-BE/obj
 backend/Billy-BE/bin
+backend/Billy-BE/Billy-BE.csproj
+backend/Billy-BE/data.db
+backend/.idea
+

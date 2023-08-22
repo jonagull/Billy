@@ -17,14 +17,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
 
-# Copy the SQLite database file
-COPY data.db .
-
 # Expose port 80
 EXPOSE 80 
 
 # Set the entry point for the application
 ENTRYPOINT ["dotnet", "Billy-BE.dll"]
-
-
-# docker run -d -p 80:80 -v /path/on/host/data.db:/app/data.db my-dotnet-app
