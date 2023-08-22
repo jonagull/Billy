@@ -1,11 +1,13 @@
 <script lang="ts">
+    import { Alert } from "stwui";
+    import { fade, fly } from "svelte/transition";
     import { onMount } from "svelte";
     import poolSticks from "$lib/assets/poolbattle.png";
     import type { Player } from "$lib/interfaces";
     import { baseUrl } from "$lib/constants";
+    import { shortQuotes } from "$lib/data/quotes";
 
     let winnerId: number | undefined;
-    let timeOfPlay = new Date().toISOString();
     let players: Player[] = [];
     let selectedPlayerOneId: number | undefined;
     let selectedPlayerOne: Player | undefined;
@@ -14,6 +16,7 @@
     let availablePlayers: Player[] = [];
     let playerOneRatingChange: number;
     let playerTwoRatingChange: number;
+    let showAlert = false;
 
     onMount(() => {
         fetchPlayers();
@@ -93,12 +96,17 @@
 
             if (response.ok) {
                 // Handle successful response
+                showAlert = true;
                 selectedPlayerOneId = undefined;
                 selectedPlayerTwoId = undefined;
                 winnerId = undefined;
                 const data = await response.json();
                 playerOneRatingChange = data.playerOne.ratingDiff;
                 playerTwoRatingChange = data.playerTwo.ratingDiff;
+
+                setTimeout(() => {
+                    showAlert = false;
+                }, 7000);
             } else {
                 // Handle error response
                 console.error("Failed to submit game.");
@@ -108,6 +116,18 @@
         }
     }
 </script>
+
+{#if showAlert}
+    <div class="alert" in:fly={{ y: 200, duration: 2000 }} out:fade>
+        <Alert type="success">
+            <Alert.Title slot="title">Game logged!</Alert.Title>
+            <Alert.Description slot="description" class="italic"
+                >{shortQuotes[Math.floor(Math.random() * shortQuotes.length)]
+                    .quote}</Alert.Description
+            >
+        </Alert>
+    </div>
+{/if}
 
 <main>
     <div class="flex flex-col items-center">
@@ -264,6 +284,14 @@
 </main>
 
 <style>
+    .alert {
+        position: fixed;
+        top: 10%;
+        right: 20px;
+        z-index: 1000;
+        width: 400px;
+    }
+
     .green-text {
         color: #629924;
     }

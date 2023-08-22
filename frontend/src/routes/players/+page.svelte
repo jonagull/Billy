@@ -1,9 +1,10 @@
 <script lang="ts">
     import { baseUrl } from "$lib/constants";
-    import type { Player } from "$lib/images/interfaces";
     import { Input } from "stwui";
     import { Button } from "stwui";
     import { onMount } from "svelte";
+    import { Modal, Portal } from "stwui";
+    import type { Player } from "$lib/interfaces";
 
     let playerName = "";
     let players: Player[] = [];
@@ -15,7 +16,10 @@
     function formatDateTime(dateTimeString: string | number | Date) {
         const dateTime = new Date(dateTimeString);
         const options = { day: "numeric", month: "numeric", year: "numeric" };
-        return dateTime.toLocaleDateString(undefined, options);
+        return dateTime.toLocaleDateString(
+            "no",
+            options as Intl.DateTimeFormatOptions
+        );
     }
 
     function addPlayer() {
@@ -79,18 +83,56 @@
             console.error("Error removing player:", error);
         }
     }
+
+    let open = false;
+
+    function openModal() {
+        open = true;
+    }
+
+    function closeModal() {
+        open = false;
+    }
 </script>
 
 <main>
     <h1>Players</h1>
 
-    <div class="flex mb-20">
+    <!-- <div class="flex mb-20">
         <Input name="input" placeholder="Name" bind:value={playerName} />
 
         <Button on:click={addPlayer} type="primary">Add</Button>
-    </div>
+    </div> -->
 
-    <h2 class="title text-2xl font-bold mb-2">Players</h2>
+    <Button class="mb-5" type="primary" on:click={openModal}>Add player</Button>
+
+    <Portal>
+        {#if open}
+            <Modal handleClose={closeModal}>
+                <Modal.Content slot="content">
+                    <Modal.Content.Header slot="header"
+                        >Add player</Modal.Content.Header
+                    >
+                    <Modal.Content.Body slot="body">
+                        <Input
+                            name="input"
+                            placeholder="Name"
+                            bind:value={playerName}
+                        />
+
+                        <Button class="mt-3" on:click={addPlayer} type="primary"
+                            >Add</Button
+                        >
+                    </Modal.Content.Body>
+                </Modal.Content>
+            </Modal>
+        {/if}
+    </Portal>
+
+    <!-- Might have to implement backend pagination for this to work -->
+    <!-- <TheTable data={players} /> -->
+
+    <h2 class="text-2xl font-bold mb-2">Players</h2>
     <table class="table-auto min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
             <tr>
@@ -219,14 +261,6 @@
 </main>
 
 <style>
-    table {
-        margin-left: -50px;
-    }
-
-    .title {
-        margin-left: -50px;
-    }
-
     input {
         width: 100px;
     }

@@ -21,12 +21,10 @@
             >
                 Billy
             </h1>
-            <p class="max-w-2xl font-light text-gray-500">
-                {quotes[randomIndex].quote}
+            <p class="text-gray-500 italic max-w-2xl font-light">
+                {`"${quotes[randomIndex].quote}"`}
             </p>
-            <p
-                class="place-self-end max-w-2xl mb-2 mr-2 font-light text-gray-500"
-            >
+            <p class="place-self-start max-w-2xl mb-2 mr-2 text-gray-200">
                 - {quotes[randomIndex].author}
             </p>
             <a
