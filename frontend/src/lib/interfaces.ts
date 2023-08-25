@@ -10,7 +10,16 @@ export interface Player {
 }
 
 export interface GamePlayed {
-    playerOneId: number;
-    playerTwoId: number;
-    winnerId: number;
+    id: number;
+    playerOneElo: number;
+    playerTwoElo: number;
+    playerOne: Player;
+    playerTwo: Player;
+    winner: Player;
+    timeOfPlay: Date;
+}
+
+export interface PlayerProfile {
+    player: Player;
+    gamesPlayed: GamePlayed[];
 }

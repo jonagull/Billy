@@ -1,3 +1,4 @@
+using Billy_BE.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Billy_BE.Models;
@@ -25,16 +26,29 @@ namespace Billy_BE.Controllers
 
         // GET: api/Players/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Player>> GetPlayer(int id)
+        public async Task<ActionResult<PlayerProfileDto>> GetPlayer(int id)
         {
             var player = await _context.Players.FindAsync(id);
+            
+            var gamesPlayed = await _context.GamesPlayed
+                .Include(game => game.PlayerOne)
+                .Include(game => game.PlayerTwo)
+                .Include(game => game.Winner)
+                .Where(game => game.PlayerOne.Id == id || game.PlayerTwo.Id == id)
+                .ToListAsync();
 
-            if (player == null)
+           if (player == null)
             {
                 return NotFound();
             }
 
-            return player;
+            var dto = new PlayerProfileDto
+            {
+                Player = player,
+                GamesPlayed = gamesPlayed
+            };
+
+            return Ok(dto);
         }
 
         // PUT: api/Players/5
