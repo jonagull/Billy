@@ -66,7 +66,8 @@ namespace Billy_BE.Controllers
 
                 UpdatePlayerMetrics(playerOne, playerTwo, gameDto.WinnerId);
                 // Update the players' Elo ratings based on the game outcome
-                UpdateEloRatings(playerOne, playerTwo, gameDto.WinnerId);
+                // UpdateEloRatings(playerOne, playerTwo, gameDto.WinnerId);
+                CalculateElo(playerOne, playerTwo, (GameOutcome)(playerOne.Id == gameDto.WinnerId ? 1 : 0));
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
                 
@@ -123,29 +124,26 @@ namespace Billy_BE.Controllers
             playerTwo.Winrate = (int)(playerTwo.Losses > 0 || playerTwo.Wins > 0? (playerTwo.Wins * 100.0 / playerTwo.GamesPlayed) : 0);
 
         }
-
-        private void UpdateEloRatings(Player? playerOne, Player? playerTwo, int winnerId)
+        
+        static double ExpectationToWin(int playerOneRating, int playerTwoRating)
         {
-            // Calculate Elo rating changes based on the game outcome
-            const int K = 32; // Elo rating adjustment constant
+            return 1 / (1 + Math.Pow(10, (playerTwoRating - playerOneRating) / 400.0));
+        }
+        
+        enum GameOutcome
+        {
+            Win = 1, 
+            Loss = 0
+        }
 
-            if (playerTwo == null) return;
+        static void CalculateElo(Player? playerOne, Player? playerTwo, GameOutcome outcome )
+        {
+            const int K = 32;
+            
+            int delta = (int)(K * ((int)outcome - ExpectationToWin(playerOne.Rating, playerTwo.Rating)));
 
-            if (playerOne == null) return;
-            var playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
-            var playerTwoExpectedScore = 1 - playerOneExpectedScore;
-           
-            // Update Elo ratings based on the winner
-            if (winnerId == playerOne.Id)
-            {
-                playerOne.Rating += (int)(K * (1 - playerOneExpectedScore));
-                playerTwo.Rating += (int)(K * (0 - playerTwoExpectedScore));
-            }
-            else if (winnerId == playerTwo.Id)
-            {
-                playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
-                playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
-            }
+            playerOne.Rating += delta;
+            playerTwo.Rating -= delta;
         }
     }
 }
