@@ -98,7 +98,8 @@ namespace Billy_BE.Controllers
                         NewRating = playerTwo.Rating,
                         RatingDiff = playerTwoRatingDiff,
                     },
-                    GameFact = new { GameFact = gameFact }
+
+                    GameFact = gameFact
                 };
 
                 // Return the response as JSON
@@ -192,13 +193,13 @@ namespace Billy_BE.Controllers
             var gameFact = winnerId switch
             {
                 _ when playerOneLostWinStreak
-                    => $"{playerOne.Name} lost their win streak of {playerOneWinStreak}.",
+                    => $"{playerOne.Name} lost their {playerOneWinStreak} game win streak.",
                 _ when playerTwoLostWinStreak
-                    => $"{playerTwo.Name} lost their win streak of {playerTwoWinStreak}.",
+                    => $"{playerTwo.Name} lost their {playerTwoWinStreak} game win streak.",
                 _ when winnerId == playerOne.Id && playerOneWinStreak >= 3
-                    => $"{playerOne.Name} won and has a win streak of {playerOneWinStreak + 1} games.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
+                    => $"{playerOne.Name} won and has a {playerOneWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
                 _ when winnerId == playerTwo.Id && playerTwoWinStreak >= 3
-                    => $"{playerTwo.Name} won and has a win streak of {playerTwoWinStreak + 1} games.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
+                    => $"{playerTwo.Name} won and has a  {playerTwoWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
                 _ => $"{(winnerId == playerOne.Id ? playerOne.Name : playerTwo.Name)} won the game."
             };
 
