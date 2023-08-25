@@ -17,6 +17,7 @@
     let playerOneRatingChange: number;
     let playerTwoRatingChange: number;
     let showAlert = false;
+    let gameFact: string;
 
     onMount(() => {
         fetchPlayers();
@@ -103,6 +104,7 @@
                 const data = await response.json();
                 playerOneRatingChange = data.playerOne.ratingDiff;
                 playerTwoRatingChange = data.playerTwo.ratingDiff;
+                gameFact = data.gameFact;
 
                 setTimeout(() => {
                     showAlert = false;
@@ -122,8 +124,7 @@
         <Alert type="success">
             <Alert.Title slot="title">Game logged!</Alert.Title>
             <Alert.Description slot="description" class="italic"
-                >{shortQuotes[Math.floor(Math.random() * shortQuotes.length)]
-                    .quote}</Alert.Description
+                >{gameFact}</Alert.Description
             >
         </Alert>
     </div>
