@@ -3,9 +3,11 @@ import type { PlayerProfile } from "$lib/interfaces";
 import type { PageLoad } from "./$types";
 
 export const load = (async ({ params }) => {
-    const data: PlayerProfile = await fetchPageData("Players/" + params.id);
+    const response: PlayerProfile = await fetchPageData("Players/" + params.id);
 
     return {
-        pageData: data,
+        pageData: response,
+        gamesPlayed: response.gamesPlayed.reverse(),
+        player: response.player,
     };
 }) satisfies PageLoad;
