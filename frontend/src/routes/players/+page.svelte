@@ -5,9 +5,11 @@
     import { onMount } from "svelte";
     import { Modal, Portal } from "stwui";
     import type { Player } from "$lib/interfaces";
+    import { goto } from "$app/navigation";
 
     let playerName = "";
     let players: Player[] = [];
+    let open = false;
 
     onMount(() => {
         getPlayers();
@@ -69,8 +71,6 @@
         }
     }
 
-    let open = false;
-
     function openModal() {
         open = true;
     }
@@ -78,6 +78,10 @@
     function closeModal() {
         open = false;
     }
+
+    const goToPlayer = (id: number) => {
+        goto(`players/${id}`, { replaceState: true });
+    };
 </script>
 
 <main>
@@ -159,17 +163,23 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
             {#each players as player (player.id)}
-                <tr>
-                    <td class="px-4 py-2 tespace-nowrap">
-                        <a href={`/players/${player.id}`}>{player.name}</a>
-                        <!-- <input
+                <tr on:click={() => goToPlayer(player.id)}>
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
+                        <!-- <a href={`/players/${player.id}`}>{player.name}</a> -->
+                        <input
                             readonly
                             name="input"
                             class="border-none"
                             value={player.name}
-                        /> -->
+                        />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -177,7 +187,10 @@
                             value={player.rating}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -185,7 +198,10 @@
                             value={player.gamesPlayed}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -193,7 +209,10 @@
                             value={player.wins}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -201,7 +220,10 @@
                             value={player.losses}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -209,7 +231,10 @@
                             value={player.winrate + "%"}
                         />
                     </td>
-                    <td class="px-4 py-2 tespace-nowrap">
+                    <td
+                        on:click={() => goToPlayer(player.id)}
+                        class="px-4 py-2 tespace-nowrap"
+                    >
                         <input
                             readonly
                             name="input"
@@ -226,5 +251,19 @@
 <style>
     input {
         width: 100px;
+    }
+
+    tr:hover input {
+        background-color: lightgray; /* Change to your preferred color */
+        cursor: pointer;
+    }
+
+    /* input:hover {
+        cursor: pointer;
+    } */
+
+    tr:hover {
+        background-color: lightgray; /* Change to your preferred color */
+        cursor: pointer;
     }
 </style>
