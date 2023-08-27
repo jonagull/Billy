@@ -1,30 +1,36 @@
 <script lang="ts">
+    import { preloadCode } from "$app/navigation";
     import { chart, dice, person } from "$lib/assets/svg/svgPaths";
     import type { GamePlayed } from "$lib/interfaces";
     import type { PageData } from "./$types";
+    import { Tabs } from "stwui";
+    import { Input } from "stwui";
 
     export let data: PageData;
+    let currentTab = "#tab1";
 
-    const getGameLineLabel = (game: GamePlayed) => {
-        const label =
-            game.winner.name === data.pageData.player.name
-                ? `Vant over ${
-                      game.winner.name === game.playerOne.name &&
-                      game.playerOne.name === data.pageData.player.name
-                          ? game.playerTwo.name
-                          : game.playerOne.name
-                  }`
-                : `Tapte mot ${
-                      game.winner.name !== game.playerOne.name &&
-                      game.playerOne.name === data.pageData.player.name
-                          ? game.playerTwo.name
-                          : game.playerOne.name
-                  }`;
-
-        return label;
-    };
-
-    import { Tabs } from "stwui";
+    let playerMetrics = [
+        {
+            label: "Antall kamper",
+            value: data.player.gamesPlayed as unknown as string,
+        },
+        {
+            label: "Rating",
+            value: data.player.rating as unknown as string,
+        },
+        {
+            label: "Wins",
+            value: data.player.wins as unknown as string,
+        },
+        {
+            label: "Loss",
+            value: data.player.losses as unknown as string,
+        },
+        {
+            label: "Winrate",
+            value: (data.player.winrate as unknown as string) + "%",
+        },
+    ];
 
     interface Tab {
         href: string;
@@ -50,10 +56,27 @@
         },
     ];
 
-    let currentTab = "#tab1";
+    const getGameLineLabel = (game: GamePlayed) => {
+        const label =
+            game.winner.name === data.player.name
+                ? `Vant over ${
+                      game.winner.name === game.playerOne.name &&
+                      game.playerOne.name === data.player.name
+                          ? game.playerTwo.name
+                          : game.playerOne.name
+                  }`
+                : `Tapte mot ${
+                      game.winner.name !== game.playerOne.name &&
+                      game.playerOne.name === data.player.name
+                          ? game.playerTwo.name
+                          : game.playerOne.name
+                  }`;
+
+        return label;
+    };
 </script>
 
-<h1 style="margin-bottom:10px">{data.pageData.player.name}</h1>
+<h1 style="margin-bottom:10px">{data.player.name}</h1>
 
 <Tabs {currentTab} variant="bar">
     {#each tabs as tab, i}
@@ -67,6 +90,16 @@
         </Tabs.Tab>
     {/each}
 </Tabs>
+
+{#if currentTab === "#tab1"}
+    <div style="margin-top: 10px">
+        {#each playerMetrics as metric}
+            <Input name="input" readonly={true} placeholder={metric.value}>
+                <Input.Label slot="label">{metric.label}</Input.Label>
+            </Input>
+        {/each}
+    </div>
+{/if}
 
 {#if currentTab === "#tab2"}
     <div class="feed" style="margin-top: 10px">
@@ -87,6 +120,17 @@
             </div>
         {/each}
     </div>
+{/if}
+
+{#if currentTab === "#tab3"}
+    <h2>Under construction</h2>
+    <pre>
+            T                                    \`.    T
+            |    T     .--------------.___________) \   |    T
+            !    |     |//////////////|___________[ ]   !  T |
+                 !     `--------------'           ) (      | !
+                                              mn  '-'      !
+     </pre>
 {/if}
 
 <style>
