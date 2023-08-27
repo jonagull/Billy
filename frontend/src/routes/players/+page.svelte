@@ -69,22 +69,6 @@
         }
     }
 
-    async function removePlayer(id: number) {
-        try {
-            const response = await fetch(`${baseUrl}/Players/${id}`, {
-                method: "DELETE",
-            });
-
-            if (response.ok) {
-                getPlayers();
-            } else {
-                console.error("Failed to remove player");
-            }
-        } catch (error) {
-            console.error("Error removing player:", error);
-        }
-    }
-
     let open = false;
 
     function openModal() {
@@ -177,12 +161,13 @@
             {#each players as player (player.id)}
                 <tr>
                     <td class="px-4 py-2 tespace-nowrap">
-                        <input
+                        <a href={`/players/${player.id}`}>{player.name}</a>
+                        <!-- <input
                             readonly
                             name="input"
                             class="border-none"
                             value={player.name}
-                        />
+                        /> -->
                     </td>
                     <td class="px-4 py-2 tespace-nowrap">
                         <input
@@ -232,15 +217,6 @@
                             value={formatDateTime(player.dateCreated)}
                         />
                     </td>
-                    <!-- <td class="px-4 py-2 tespace-nowrap">
-                        <Button
-                            on:click={() => removePlayer(player.id)}
-                            type="danger"
-                            class="text-white bg-red-500 hover:bg-red-600"
-                        >
-                            Remove
-                        </Button>
-                    </td> -->
                 </tr>
             {/each}
         </tbody>
