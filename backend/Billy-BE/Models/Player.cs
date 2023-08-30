@@ -10,5 +10,7 @@ namespace Billy_BE.Models
         public int Wins { get; set; }
         public int Losses { get; set; }
         public int Winrate { get; set; }
+        public int CurrentWinStreak { get; set; }
+        public int LongestWinStreak { get; set; }
     }
 }

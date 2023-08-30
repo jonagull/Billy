@@ -154,6 +154,18 @@
                     Winrate
                 </th>
                 <th
+                scope="col"
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                Current Winstreak
+                </th>
+                <th
+                scope="col"
+                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                Longest Winstreak
+                 </th>
+                <th
                     scope="col"
                     class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
@@ -235,6 +247,22 @@
                         on:click={() => goToPlayer(player.id)}
                         class="px-4 py-2 tespace-nowrap"
                     >
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            value={player.currentWinStreak}
+                        />
+                    </td>
+                    <td class="px-4 py-2 tespace-nowrap">
+                        <input
+                            readonly
+                            name="input"
+                            class="border-none"
+                            value={player.longestWinStreak}
+                        />
+                    </td>
+                    <td class="px-4 py-2 tespace-nowrap">
                         <input
                             readonly
                             name="input"
