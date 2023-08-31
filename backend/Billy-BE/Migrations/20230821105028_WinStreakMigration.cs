@@ -17,37 +17,28 @@ namespace Billy_BE.Migrations
                 UPDATE Players
                 SET CurrentWinStreak = 0, LongestWinStreak = 0;
 
-                WITH GameWinners AS (
-                    SELECT
-                        CASE WHEN g.PlayerOneId = p.Id THEN g.PlayerOneId ELSE g.PlayerTwoId END AS WinnerId,
-                        g.TimeOfPlay
-                    FROM
-                        GamesPlayed g
-                        JOIN Players p ON g.WinnerId = p.Id
-                )
-                UPDATE Players
-                SET
-                    CurrentWinStreak = (
-                        SELECT COUNT(*) 
-                        FROM (
-                            SELECT MAX(TimeOfPlay) as MaxTimeOfPlay
-                            FROM GameWinners
-                            WHERE WinnerId = Players.Id
-                            GROUP BY strftime('%Y-%m-%d', TimeOfPlay)
-                        ) AS WinStreaks
-                        WHERE WinStreaks.MaxTimeOfPlay = (SELECT MAX(TimeOfPlay) FROM GameWinners)
-                    ),
-                    LongestWinStreak = (
-                        SELECT MAX(StreakCount) FROM (
-                            SELECT
-                                MAX(TimeOfPlay) AS MaxTimeOfPlay,
-                                COUNT(*) AS StreakCount
-                            FROM GameWinners
-                            WHERE WinnerId = Players.Id
-                            GROUP BY strftime('%Y-%m-%d', TimeOfPlay)
-                        ) AS WinStreaks
-                    )
-                WHERE Id IN (SELECT DISTINCT WinnerId FROM GameWinners);
+                UPDATE Players AS p
+                SET CurrentWinStreak = (
+                  SELECT COUNT(*) FROM GamesPlayed 
+                  WHERE WinnerId = p.Id AND TimeOfPlay > (
+                    SELECT TimeOfPlay FROM GamesPlayed 
+                    WHERE WinnerId != p.Id AND (PlayerOneId = p.Id OR PlayerTwoId = p.Id) 
+                    ORDER BY TimeOfPlay DESC LIMIT 1
+                  )
+                ),
+                LongestWinStreak = IFNULL((
+                  SELECT COUNT(StreakId)
+                  FROM (
+                    SELECT WinnerId, TimeOfPlay,
+                    ROW_NUMBER() OVER (ORDER BY TimeOfPlay) * 987 - 
+                    ROW_NUMBER() OVER (PARTITION BY WinnerId ORDER BY TimeOfPlay) * 987 AS StreakId
+                    FROM GamesPlayed WHERE PlayerOneId = p.Id OR PlayerTwoId = p.Id
+                  ) AS Streaks 
+                  WHERE WinnerId = p.Id
+                  GROUP BY WinnerId, StreakId
+                  ORDER BY COUNT(StreakId) DESC
+                  LIMIT 1
+                ), 0);
             ");
         }
 
