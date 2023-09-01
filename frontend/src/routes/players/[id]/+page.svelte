@@ -139,10 +139,10 @@
 
 <style>
     .game {
+        border: 1px solid black;
         border-radius: 10px;
         padding: 10px;
     }
-
     .feed {
         margin: 0 300px;
         padding: 50px 0;
