@@ -104,7 +104,11 @@
 {#if currentTab === "#tab2"}
     <div class="feed" style="margin-top: 10px">
         {#each data.gamesPlayed as game}
-            <div class="games">
+            <div
+                class={game.winner.name === data.player.name
+                    ? "games game bg-green-200"
+                    : "games game bg-red-200"}
+            >
                 <span
                     style="display: flex; margin-bottom: 2px; height:20px; align-items: center"
                 >
@@ -134,6 +138,11 @@
 {/if}
 
 <style>
+    .game {
+        border-radius: 10px;
+        padding: 10px;
+    }
+
     .feed {
         margin: 0 300px;
         padding: 50px 0;
