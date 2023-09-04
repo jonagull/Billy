@@ -52,10 +52,6 @@
         const playerId = +event.target.value;
         winnerId = playerId;
 
-        selectedPlayerTwo = data.players.find(
-            (player: { id: number | undefined }) =>
-                player.id === selectedPlayerTwoId
-        );
         updateAvailablePlayers();
     }
 
