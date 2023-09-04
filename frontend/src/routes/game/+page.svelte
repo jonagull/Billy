@@ -5,10 +5,11 @@
     import poolSticks from "$lib/assets/poolbattle.png";
     import type { Player } from "$lib/interfaces";
     import { baseUrl } from "$lib/constants";
-    import { shortQuotes } from "$lib/data/quotes";
+    import type { PageData } from "./$types";
+
+    export let data: PageData;
 
     let winnerId: number | undefined;
-    let players: Player[] = [];
     let selectedPlayerOneId: number | undefined;
     let selectedPlayerOne: Player | undefined;
     let selectedPlayerTwoId: number | undefined;
@@ -20,16 +21,16 @@
     let gameFact: string;
 
     onMount(() => {
-        fetchPlayers();
-        availablePlayers = players;
+        availablePlayers = data.players;
     });
 
     function handlePlayerOneSelect(event: any) {
         const playerId = +event.target.value;
         selectedPlayerOneId = playerId;
 
-        selectedPlayerOne = players.find(
-            (player) => player.id === selectedPlayerOneId
+        selectedPlayerOne = data.players.find(
+            (player: { id: number | undefined }) =>
+                player.id === selectedPlayerOneId
         );
 
         updateAvailablePlayers();
@@ -39,9 +40,11 @@
         const playerId = +event.target.value;
         selectedPlayerTwoId = playerId;
 
-        selectedPlayerTwo = players.find(
-            (player) => player.id === selectedPlayerTwoId
+        selectedPlayerTwo = data.players.find(
+            (player: { id: number | undefined }) =>
+                player.id === selectedPlayerTwoId
         );
+
         updateAvailablePlayers();
     }
 
@@ -49,30 +52,18 @@
         const playerId = +event.target.value;
         winnerId = playerId;
 
-        selectedPlayerTwo = players.find(
-            (player) => player.id === selectedPlayerTwoId
+        selectedPlayerTwo = data.players.find(
+            (player: { id: number | undefined }) =>
+                player.id === selectedPlayerTwoId
         );
         updateAvailablePlayers();
     }
 
     function updateAvailablePlayers() {
-        availablePlayers = players.filter(
-            (player) => player.id !== selectedPlayerOneId
+        availablePlayers = data.players.filter(
+            (player: { id: number | undefined }) =>
+                player.id !== selectedPlayerOneId
         );
-    }
-
-    async function fetchPlayers() {
-        try {
-            const response = await fetch(baseUrl + "/Players");
-            if (response.ok) {
-                players = await response.json();
-                players.sort((a, b) => a.name.localeCompare(b.name));
-            } else {
-                console.error("Failed to fetch players.");
-            }
-        } catch (error) {
-            console.error("An error occurred:", error);
-        }
     }
 
     async function submitForm() {
@@ -150,7 +141,7 @@
                     on:change={handlePlayerOneSelect}
                 >
                     <option value="">Select Player One</option>
-                    {#each players as player}
+                    {#each data.players as player}
                         <option value={player.id}>{player.name}</option>
                     {/each}
                 </select>

@@ -5,6 +5,8 @@ export const load = (async () => {
     const response: any = await fetchPageData("Players");
 
     return {
-        players: response,
+        players: response.sort((a: any, b: any) =>
+            a.name.localeCompare(b.name)
+        ),
     };
 }) satisfies PageLoad;
