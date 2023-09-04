@@ -61,8 +61,7 @@
 
     function updateAvailablePlayers() {
         availablePlayers = data.players.filter(
-            (player: { id: number | undefined }) =>
-                player.id !== selectedPlayerOneId
+            (player: any) => player.id !== selectedPlayerOneId
         );
     }
 
