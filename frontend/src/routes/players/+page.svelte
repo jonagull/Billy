@@ -2,18 +2,14 @@
     import { baseUrl } from "$lib/constants";
     import { Input } from "stwui";
     import { Button } from "stwui";
-    import { onMount } from "svelte";
     import { Modal, Portal } from "stwui";
-    import type { Player } from "$lib/interfaces";
     import { goto } from "$app/navigation";
+    import type { PageData } from "./$types";
+
+    export let data: PageData;
 
     let playerName = "";
-    let players: Player[] = [];
     let open = false;
-
-    onMount(() => {
-        getPlayers();
-    });
 
     function formatDateTime(dateTimeString: string | number | Date) {
         const dateTime = new Date(dateTimeString);
@@ -43,7 +39,6 @@
                 if (response.ok) {
                     console.log("Player added successfully");
                     playerName = ""; // Reset the player name
-                    await getPlayers();
                     closeModal();
                 } else {
                     console.error("Failed to add player");
@@ -55,20 +50,6 @@
                     error
                 );
             });
-    }
-
-    async function getPlayers() {
-        try {
-            const response = await fetch(baseUrl + "/Players");
-            if (response.ok) {
-                players = await response.json();
-                players.sort((a, b) => b.rating - a.rating);
-            } else {
-                console.error("Failed to retrieve players");
-            }
-        } catch (error) {
-            console.error("An error occurred while retrieving players", error);
-        }
     }
 
     function openModal() {
@@ -154,17 +135,17 @@
                     Winrate
                 </th>
                 <th
-                scope="col"
-                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                Current Winstreak
+                    Current Winstreak
                 </th>
                 <th
-                scope="col"
-                class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    scope="col"
+                    class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                Longest Winstreak
-                 </th>
+                    Longest Winstreak
+                </th>
                 <th
                     scope="col"
                     class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -174,7 +155,7 @@
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-            {#each players as player (player.id)}
+            {#each data.players as player (player.id)}
                 <tr on:click={() => goToPlayer(player.id)}>
                     <td
                         on:click={() => goToPlayer(player.id)}
