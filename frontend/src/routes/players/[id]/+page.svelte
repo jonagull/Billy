@@ -5,12 +5,15 @@
     import type { PageData } from "./$types";
     import { Tabs } from "stwui";
     import { Input } from "stwui";
+    import { goto } from "$app/navigation";
 
     export let data: PageData;
 
+    let playerId: any;
+
     let currentTab = "#tab3";
 
-    let playerMetrics = [
+    $: playerMetrics = [
         {
             label: "Antall kamper",
             value: data.player.gamesPlayed as unknown as string,
@@ -75,9 +78,27 @@
 
         return label;
     };
+
+    const handlePlayerIdChange = () => {
+        goto("/players/" + playerId, { replaceState: true });
+    };
 </script>
 
-<h1 style="margin-bottom:10px">{data.player.name}</h1>
+<div>
+    <h1 style="margin-bottom:10px">{data.player.name}</h1>
+
+    <select
+        style="margin: 10px; width: 300px"
+        class="form-select block w-full p-2 border border-gray-300 rounded"
+        bind:value={playerId}
+        on:change={handlePlayerIdChange}
+    >
+        <option value={data.player.id}>{data.player.name}</option>
+        {#each data.players as player}
+            <option value={player.id}>{player.name}</option>
+        {/each}
+    </select>
+</div>
 
 <Tabs {currentTab} variant="bar">
     {#each tabs as tab, i}

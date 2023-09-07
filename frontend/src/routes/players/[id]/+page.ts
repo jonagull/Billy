@@ -1,15 +1,18 @@
 import { fetchPageData } from "$lib/helpers/api";
-import type { PlayerProfile } from "$lib/interfaces";
+import type { Player, PlayerProfile } from "$lib/interfaces";
 import type { PageLoad } from "./$types";
 
 export const load = (async ({ params }) => {
-    const response: PlayerProfile = await fetchPageData("Players/" + params.id);
+    const playerResponse: PlayerProfile = await fetchPageData(
+        "Players/" + params.id
+    );
+    const playersResponse: Player[] = await fetchPageData("Players");
 
-    const playerGameElos = response.gamesPlayed.map((x) =>
+    const playerGameElos = playerResponse.gamesPlayed.map((x) =>
         x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
     );
 
-    playerGameElos.push(response.player.rating);
+    playerGameElos.push(playerResponse.player.rating);
 
     const playerGameLabels = playerGameElos.map((_, index) => index);
 
@@ -17,7 +20,7 @@ export const load = (async ({ params }) => {
         labels: playerGameLabels,
         datasets: [
             {
-                label: response.player.name + " elo history",
+                label: playerResponse.player.name + " elo history",
                 fill: true,
                 lineTension: 0.3,
                 backgroundColor: "rgba(225, 204,230, .3)",
@@ -41,9 +44,12 @@ export const load = (async ({ params }) => {
     };
 
     return {
-        pageData: response,
-        gamesPlayed: response.gamesPlayed.reverse(),
-        player: response.player,
+        pageData: playerResponse,
+        gamesPlayed: playerResponse.gamesPlayed.reverse(),
+        player: playerResponse.player,
         lineData: playerEloLineData,
+        players: playersResponse.sort((a: any, b: any) =>
+            a.name.localeCompare(b.name)
+        ),
     };
 }) satisfies PageLoad;

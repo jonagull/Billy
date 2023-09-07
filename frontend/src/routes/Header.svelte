@@ -29,12 +29,20 @@
                 <a href="/players">Players</a>
             </li>
             <li
+                aria-current={$page.url.pathname.includes("players/")
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/players/1">Profiles</a>
+            </li>
+            <li
                 aria-current={$page.url.pathname === "/feed"
                     ? "page"
                     : undefined}
             >
                 <a href="/feed">Feed</a>
             </li>
+
             <li
                 aria-current={$page.url.pathname === "/rules"
                     ? "page"
