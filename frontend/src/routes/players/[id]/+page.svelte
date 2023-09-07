@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { preloadCode } from "$app/navigation";
     import { chart, dice, person } from "$lib/assets/svg/svgPaths";
+    import Chart from "$lib/components/Chart.svelte";
     import type { GamePlayed } from "$lib/interfaces";
     import type { PageData } from "./$types";
     import { Tabs } from "stwui";
     import { Input } from "stwui";
 
     export let data: PageData;
-    let currentTab = "#tab1";
+
+    let currentTab = "#tab3";
 
     let playerMetrics = [
         {
@@ -127,14 +128,7 @@
 {/if}
 
 {#if currentTab === "#tab3"}
-    <h2>Under construction</h2>
-    <pre>
-            T                                    \`.    T
-            |    T     .--------------.___________) \   |    T
-            !    |     |//////////////|___________[ ]   !  T |
-                 !     `--------------'           ) (      | !
-                                              mn  '-'      !
-     </pre>
+    <Chart data={data.lineData} />
 {/if}
 
 <style>
