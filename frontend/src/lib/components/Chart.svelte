@@ -1,7 +1,6 @@
 <script>
     // @ts-nocheck
     import { Line } from "svelte-chartjs";
-    // import { data } from "./data.js";
 
     export let data;
 
