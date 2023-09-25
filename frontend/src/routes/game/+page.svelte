@@ -3,13 +3,12 @@
     import poolSticks from "$lib/assets/poolbattle.png";
     import { baseUrl } from "$lib/constants";
     import type { PageData } from "./$types";
-
-    export let data: PageData;
     import type { Player } from "$lib/interfaces";
     import { Alert, Button } from "stwui";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
-    import { goto } from "$app/navigation";
+
+    export let data: PageData;
 
     let winnerId: number | undefined;
     let players: Player[] = [];
@@ -111,10 +110,6 @@
                 setTimeout(() => {
                     showAlert = false;
                 }, 7000);
-
-                setTimeout(() => {
-                    goto("/gallery", { replaceState: true });
-                }, 1 * 60 * 1000);
             } else {
                 // Handle error response
                 console.error("Failed to submit game.");

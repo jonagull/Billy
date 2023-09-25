@@ -7,6 +7,8 @@ export interface Player {
     wins: number;
     losses: number;
     winrate: number;
+    currentWinStreak: number;
+    longestWinStreak: number;
 }
 
 export interface GamePlayed {
