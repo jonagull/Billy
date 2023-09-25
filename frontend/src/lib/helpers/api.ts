@@ -14,7 +14,7 @@ export async function fetchPlayers(
     ascending: boolean
 ): Promise<Player[]> {
     try {
-        const url = `/players?sortBy=${sortBy}&ascending=${ascending}`;
+        const url = `/Players?sortBy=${sortBy}&ascending=${ascending}`;
 
         const response = await fetch(baseUrl + url);
 

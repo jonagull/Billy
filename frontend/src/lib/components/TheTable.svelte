@@ -23,6 +23,11 @@
         order = $page.url.searchParams.get("order") === "desc" ? "desc" : "asc";
     }
 
+    // TODO: implement this
+    // const goToPlayer = (id: number) => {
+    //     goto(`players/${id}`, { replaceState: true });
+    // };
+
     function addPlayer() {
         const playerData = {
             name: playerName,
