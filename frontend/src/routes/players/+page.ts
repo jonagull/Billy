@@ -1,10 +1,16 @@
-import { fetchPageData } from "$lib/helpers/api";
+import { fetchPageData, fetchPlayers } from "$lib/helpers/api";
 import type { PageLoad } from "./$types";
 
-export const load = (async () => {
-    const response: any[] = await fetchPageData("Players");
+export const load = (async ({ params, url }) => {
+    const orderBy = url.searchParams.get("orderBy");
+    const order = url.searchParams.get("order");
+
+    const players = await fetchPlayers(
+        orderBy || "id",
+        order === "asc" ? true : false
+    );
 
     return {
-        players: response.sort((a: any, b: any) => b.rating - a.rating),
+        players: players,
     };
 }) satisfies PageLoad;

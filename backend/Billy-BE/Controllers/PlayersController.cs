@@ -19,17 +19,59 @@ namespace Billy_BE.Controllers
 
         // GET: api/Players
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Player>>> GetPlayers()
+        public async Task<ActionResult<IEnumerable<Player>>> GetPlayers(string sortBy = "Id", bool ascending = true)
         {
-            return await _context.Players.ToListAsync();
+            // Define the query
+            IQueryable<Player> query = _context.Players;
+
+            // Determine the property to sort by
+            switch (sortBy.ToLower())
+            {
+                case "name":
+                    query = ascending ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name);
+                    break;
+                case "rating":
+                    query = ascending ? query.OrderBy(p => p.Rating) : query.OrderByDescending(p => p.Rating);
+                    break;
+                case "gamesplayed":
+                    query = ascending ? query.OrderBy(p => p.GamesPlayed) : query.OrderByDescending(p => p.GamesPlayed);
+                    break;
+                case "datecreated":
+                    query = ascending ? query.OrderBy(p => p.DateCreated) : query.OrderByDescending(p => p.DateCreated);
+                    break;
+                case "wins":
+                    query = ascending ? query.OrderBy(p => p.Wins) : query.OrderByDescending(p => p.Wins);
+                    break;
+                case "losses":
+                    query = ascending ? query.OrderBy(p => p.Losses) : query.OrderByDescending(p => p.Losses);
+                    break;
+                case "winrate":
+                    query = ascending ? query.OrderBy(p => p.Winrate) : query.OrderByDescending(p => p.Winrate);
+                    break;
+                case "currentwinstreak":
+                    query = ascending ? query.OrderBy(p => p.CurrentWinStreak) : query.OrderByDescending(p => p.CurrentWinStreak);
+                    break;
+                case "longestwinstreak":
+                    query = ascending ? query.OrderBy(p => p.LongestWinStreak) : query.OrderByDescending(p => p.LongestWinStreak);
+                    break;
+                default:
+                    // If sortBy is not recognized, sort by Id (ascending) by default
+                    query = query.OrderBy(p => p.Id);
+                    break;
+            }
+
+            // Execute the query and return the sorted results
+            var players = await query.ToListAsync();
+            return players;
         }
+
 
         // GET: api/Players/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayerProfileDto>> GetPlayer(int id)
         {
             var player = await _context.Players.FindAsync(id);
-            
+
             var gamesPlayed = await _context.GamesPlayed
                 .Include(game => game.PlayerOne)
                 .Include(game => game.PlayerTwo)
@@ -37,7 +79,7 @@ namespace Billy_BE.Controllers
                 .Where(game => game.PlayerOne.Id == id || game.PlayerTwo.Id == id)
                 .ToListAsync();
 
-           if (player == null)
+            if (player == null)
             {
                 return NotFound();
             }
@@ -93,8 +135,8 @@ namespace Billy_BE.Controllers
                 ModelState.AddModelError("Name", "Player must have a name!");
                 return BadRequest(ModelState);
             }
-            
-            
+
+
             // Check if the player with the same name already exists in the database
             if (_context.Players.Any(p => p.Name == player.Name))
             {
