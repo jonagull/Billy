@@ -84,7 +84,7 @@
 
 <style>
     .feed {
-        margin: 0 300px;
+        margin: 0 600px;
         padding: 50px 0;
         display: flex;
         flex-direction: column;

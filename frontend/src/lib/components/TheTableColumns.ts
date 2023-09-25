@@ -3,47 +3,47 @@ import type { TableColumn } from "stwui/types";
 export const columns: TableColumn[] = [
     {
         column: "name",
-        label: "name",
+        label: "Name",
         placement: "left",
     },
     {
         column: "rating",
-        label: "rating",
+        label: "Elo",
         placement: "left",
     },
     {
         column: "gamesPlayed",
-        label: "gamesPlayed",
+        label: "Games played",
         placement: "left",
     },
     {
         column: "wins",
-        label: "wins",
+        label: "Wins",
         placement: "left",
     },
     {
         column: "losses",
-        label: "losses",
+        label: "Losses",
         placement: "left",
     },
     {
         column: "winrate",
-        label: "winrate",
+        label: "Winrate",
         placement: "left",
     },
     {
         column: "currentWinStreak",
-        label: "currentWinStreak",
+        label: "Current winstreak",
         placement: "left",
     },
     {
         column: "longestWinStreak",
-        label: "longestWinStreak",
+        label: "Longest winstreak",
         placement: "left",
     },
     {
         column: "dateCreated",
-        label: "dateCreated",
+        label: "Date created",
         placement: "left",
     },
 ];
