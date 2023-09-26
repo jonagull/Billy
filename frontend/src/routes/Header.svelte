@@ -26,7 +26,7 @@
                     ? "page"
                     : undefined}
             >
-                <a href="/players">Players</a>
+                <a href="/players?orderBy=rating&order=desc">Players</a>
             </li>
             <li
                 aria-current={$page.url.pathname.includes("players/")
