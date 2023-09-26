@@ -6,7 +6,7 @@ export const load = (async ({ params, url }) => {
     const order = url.searchParams.get("order");
 
     const players = await fetchPlayers(
-        orderBy || "id",
+        orderBy || "rating",
         order === "asc" ? true : false
     );
 

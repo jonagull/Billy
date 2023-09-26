@@ -23,10 +23,9 @@
         order = $page.url.searchParams.get("order") === "desc" ? "desc" : "asc";
     }
 
-    // TODO: implement this
-    // const goToPlayer = (id: number) => {
-    //     goto(`players/${id}`, { replaceState: true });
-    // };
+    const goToPlayer = (id: number) => {
+        goto(`players/${id}`, { replaceState: true });
+    };
 
     function addPlayer() {
         const playerData = {
@@ -104,7 +103,12 @@
             />
             <Table.Body slot="body">
                 {#each players as item}
-                    <Table.Body.Row id={item.id.toString()}>
+                    <Table.Body.Row
+                        id={item.id.toString()}
+                        on:click={() => {
+                            goToPlayer(item.id);
+                        }}
+                    >
                         <Table.Body.Row.Cell column={0}
                             >{item.name}</Table.Body.Row.Cell
                         >
