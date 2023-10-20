@@ -125,7 +125,7 @@
                             >{item.losses}</Table.Body.Row.Cell
                         >
                         <Table.Body.Row.Cell column={5}
-                            >{item.winrate}</Table.Body.Row.Cell
+                            >{item.winrate}%</Table.Body.Row.Cell
                         >
                         <Table.Body.Row.Cell column={6}
                             >{item.currentWinStreak}</Table.Body.Row.Cell
