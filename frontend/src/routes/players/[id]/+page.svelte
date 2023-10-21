@@ -80,6 +80,7 @@
     };
 
     const handlePlayerIdChange = () => {
+        window.sessionStorage.setItem("playerId", playerId);
         goto("/players/" + playerId, { replaceState: true });
     };
 </script>

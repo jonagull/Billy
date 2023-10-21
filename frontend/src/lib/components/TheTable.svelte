@@ -24,6 +24,7 @@
     }
 
     const goToPlayer = (id: number) => {
+        window.sessionStorage.setItem("playerId", id.toString());
         goto(`players/${id}`, { replaceState: true });
     };
 

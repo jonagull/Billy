@@ -1,6 +1,17 @@
-<script>
+<script lang="ts">
     import { page } from "$app/stores";
     import github from "$lib/assets/github.svg";
+    import { onMount } from "svelte";
+
+    let playerId: any;
+
+    onMount(() => {
+        playerId = sessionStorage.getItem("playerId") || "1";
+    });
+
+    $: {
+        playerId;
+    }
 </script>
 
 <header>
@@ -33,7 +44,7 @@
                     ? "page"
                     : undefined}
             >
-                <a href="/players/1">Profiles</a>
+                <a href={`/players/${playerId}`}>Profiles</a>
             </li>
             <li
                 aria-current={$page.url.pathname === "/feed"
