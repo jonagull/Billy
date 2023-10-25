@@ -34,6 +34,14 @@
             label: "Winrate",
             value: (data.player.winrate as unknown as string) + "%",
         },
+        {
+            label: "Current winstreak",
+            value: data.player.currentWinStreak as unknown as string,
+        },
+        {
+            label: "Longest winstreak",
+            value: data.player.longestWinStreak as unknown as string,
+        },
     ];
 
     interface Tab {

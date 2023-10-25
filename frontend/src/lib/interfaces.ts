@@ -25,3 +25,8 @@ export interface PlayerProfile {
     player: Player;
     gamesPlayed: GamePlayed[];
 }
+
+export interface PlayerEloProgression {
+    player: Player;
+    elos: number[];
+}
