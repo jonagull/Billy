@@ -17,7 +17,52 @@ namespace Billy_BE.Controllers
             _context = context;
         }
 
-        // GET: api/Players
+        [HttpGet("Elos")]
+        public async Task<ActionResult<IEnumerable<PlayerEloProgressionDto>>> GetPlayersEloProgressions()
+        {
+            var players = await _context.Players.ToListAsync();
+            var games = await _context.GamesPlayed.ToListAsync();
+            List<PlayerEloProgressionDto> dto = new List<PlayerEloProgressionDto>();
+            
+            for (int i = 0; i < players.Count; i++)
+            {
+                var playerId = players[i].Id;
+                var player = players[i];
+                List<int> gamesPlayed = new List<int>();
+
+                var playerEloProgression = new PlayerEloProgressionDto
+                {
+                    Player = player, Elos = gamesPlayed
+                };
+                
+                // Add the starter Elo of player
+                playerEloProgression.Elos.Add(1500);
+
+                for (int j = 0; j < games.Count; j++)
+                {
+                    if (games[j].PlayerOne.Id == playerId || games[j].PlayerTwo.Id == playerId)
+                    {
+                        var playerElo = games[j].PlayerOne.Id == playerId ? games[j].PlayerOneElo : games[j].PlayerTwoElo;
+                        playerEloProgression.Elos.Add(playerElo);
+                    }
+                }
+                
+                // Add the current elo that a player has
+                playerEloProgression.Elos.Add(player.Rating);
+                
+                dto?.Add(playerEloProgression);
+            }
+
+            if (dto.IsNullOrEmpty())
+            {
+                return BadRequest("No eloprogressions found");
+            }
+
+            return Ok(dto);
+        }
+
+
+    // GET: api/Players
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Player>>> GetPlayers(string sortBy = "Id", bool ascending = true)
         {
