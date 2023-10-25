@@ -46,6 +46,15 @@
             >
                 <a href={`/players/${playerId}`}>Profiles</a>
             </li>
+
+            <li
+                aria-current={$page.url.pathname === "/chart"
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/chart">Chart</a>
+            </li>
+
             <li
                 aria-current={$page.url.pathname === "/feed"
                     ? "page"
