@@ -5,6 +5,6 @@ export const load = (async () => {
     const gamesPlayed = await fetchPageData("Games");
 
     return {
-        gamesPlayed: gamesPlayed.reverse().slice(0, 5),
+        gamesPlayed: gamesPlayed.reverse().slice(0, 10),
     };
 }) satisfies PageLoad;

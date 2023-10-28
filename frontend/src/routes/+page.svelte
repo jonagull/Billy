@@ -1,17 +1,44 @@
 <script lang="ts">
-    import man from "$lib/assets/man.png";
+    import man from "$lib/assets/milkybilly.png";
     import { quotes } from "$lib/data/quotes";
     import type { PageData } from "./$types";
 
     export let data: PageData;
     let randomIndex = Math.floor(Math.random() * quotes.length);
+
+    const formatFeedDate = (time: any) => {
+        const date = new Date(time).toLocaleString("no-NO", {
+            timeZone: "Europe/Oslo",
+        });
+
+        const [datePart, timePart] = date.split(",");
+
+        if (datePart === undefined || timePart === undefined) {
+            return;
+        }
+
+        const dateAndMonthSplit = datePart.split(".", 2);
+        let dateAndMonthTogether = dateAndMonthSplit.join(".");
+        const timeSplit = timePart.split(":", 2);
+        const timeTogether = timeSplit.join(":");
+        const splittedDate = dateAndMonthTogether.split(".");
+        const splittedDateLastIndex = splittedDate[1];
+
+        if (splittedDateLastIndex.length === 1) {
+            const keksde = "0" + splittedDateLastIndex;
+            dateAndMonthTogether = splittedDate[0] + "." + keksde;
+        }
+
+        return timeTogether + " - " + dateAndMonthTogether;
+    };
 </script>
 
 <section>
     <div
         class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12"
+        style="padding-left: 140px"
     >
-        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+        <div class="hidden lg:mt-0 lg:col-span-5 lg:flex" style="width: 260px;">
             <img src={man} alt="man playing pool" />
         </div>
 
@@ -29,82 +56,115 @@
             </p>
             <a
                 href="/game"
-                class="inline-flex items-center justify-start py-3 mr-3 text-base font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
+                class="relative inline-block text-lg group"
+                style="width: 145px;"
             >
-                <button
-                    class="flex bg-transparent hover:bg-black font-semibold hover:text-white py-2 px-4 border border-black hover:border-transparent rounded"
+                <span
+                    class="relative z-10 block px-5 py-3 overflow-hidden font-medium leading-tight text-gray-800 transition-colors duration-300 ease-out border-2 border-gray-900 rounded-lg group-hover:text-white"
                 >
-                    Play game
-                    <svg
-                        class="w-5 h-5 ml-2 -mr-1"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                        ><path
-                            fill-rule="evenodd"
-                            d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                            clip-rule="evenodd"
-                        /></svg
-                    >
-                </button>
+                    <span
+                        class="absolute inset-0 w-full h-full px-5 py-3 rounded-lg bg-gray-50"
+                    />
+                    <span
+                        class="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-gray-900 group-hover:-rotate-180 ease"
+                    />
+                    <span class="relative">Play game</span>
+                </span>
+                <span
+                    class="absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear bg-gray-900 rounded-lg group-hover:mb-0 group-hover:mr-0"
+                    data-rounded="rounded-lg"
+                />
             </a>
         </div>
     </div>
 
-    <div class="feed">
+    <div class="shadow-2xl feed">
         {#each data.gamesPlayed as game}
-            <div class="games">
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div class="shadow-lg feed-element">
                 <span
-                    style="display: flex; margin-bottom: 2px; height:20px; align-items: center"
+                    style="display: flex; margin-bottom: 2px; height:20px; align-items: space-between; width: 100% "
                 >
-                    <p style="font-size: 16px;">
-                        #{`${game.id} -                         ${
-                            game.winnerName
-                        } slo ${
+                    <p class="feed-element-name">
+                        {`${
+                            game.winnerName === game.playerOneName
+                                ? game.playerOneName
+                                : game.playerTwoName
+                        }`}
+                    </p>
+                    <p class="feed-time">
+                        {formatFeedDate(game.timeOfPlay)}
+                    </p>
+                    <p class="feed-element-name">
+                        {`${
                             game.winnerName === game.playerOneName
                                 ? game.playerTwoName
                                 : game.playerOneName
                         }`}
                     </p>
                 </span>
-                <p style="font-size: 14px; color: grey;">
-                    {new Date(game.timeOfPlay).toLocaleString("en-US", {
-                        timeZone: "Europe/Oslo",
-                    })}
-                </p>
             </div>
         {/each}
-        <button
-            class="flex bg-transparent hover:bg-black font-semibold py-2 px-4 border border-black hover:border-transparent rounded"
+        <a
+            href="/feed"
+            class="relative inline-block text-lg group"
+            style="width: 145px;"
         >
-            <a href="/feed" class="hover:text-white">See more</a>
-        </button>
+            <span
+                class="relative z-10 block px-5 py-3 overflow-hidden font-medium leading-tight text-gray-800 transition-colors duration-300 ease-out border-2 border-gray-900 rounded-lg group-hover:text-white"
+            >
+                <span
+                    class="absolute inset-0 w-full h-full px-5 py-3 rounded-lg bg-gray-50"
+                />
+                <span
+                    class="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-gray-900 group-hover:-rotate-180 ease"
+                />
+                <span class="relative">See more</span>
+            </span>
+            <span
+                class="absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear bg-gray-900 rounded-lg group-hover:mb-0 group-hover:mr-0"
+                data-rounded="rounded-lg"
+            />
+        </a>
     </div>
 </section>
 
 <style>
     .feed {
-        margin: 0 600px;
+        margin: 0 200px;
         padding: 50px 0;
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: 1px solid grey;
+        border: 1px solid black;
         border-radius: 20px;
     }
 
-    .games {
+    .feed-element {
+        border-radius: 20px;
+        width: 550px;
+        padding: 10px;
+        border: 1px solid black;
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-bottom: 20px;
+        background: linear-gradient(90deg, #bbf7d0 50%, #fecaca 50%);
     }
 
-    * {
-        color: black;
+    .feed-time {
+        font-size: 14px;
+        color: white;
+        padding-left: 1px;
+        width: 110px;
+        border-radius: 5px;
+        background-color: black;
     }
 
-    p {
-        font-size: 18px;
+    .feed-element-name {
+        display: flex;
+        font-size: 16px;
+        width: 50%;
+        justify-content: center;
     }
 </style>
