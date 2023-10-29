@@ -153,10 +153,13 @@
     }
 
     .feed-time {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         font-size: 14px;
         color: white;
-        padding-left: 1px;
-        width: 110px;
+        padding: 3px;
+        width: 131px;
         border-radius: 5px;
         background-color: black;
     }
