@@ -30,3 +30,24 @@ export interface PlayerEloProgression {
     player: Player;
     elos: number[];
 }
+
+export interface HomeFeedGame {
+    id: number;
+    playerOne: Player;
+    playerTwo: Player;
+    playerOneElo: string;
+    playerTwoElo: string;
+    winner: Player;
+    newElo: NewElo;
+    timeOfPlay: string;
+}
+
+interface NewElo {
+    playerOneNewElo: number;
+    playerTwoNewElo: number;
+}
+
+export interface HomeFeedData {
+    game: HomeFeedGame;
+    newElos: NewElo;
+}

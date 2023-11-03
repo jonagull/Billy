@@ -22,13 +22,13 @@ namespace Billy_BE.Controllers
         {
             var players = await _context.Players.ToListAsync();
             var games = await _context.GamesPlayed.ToListAsync();
-            List<PlayerEloProgressionDto> dto = new List<PlayerEloProgressionDto>();
+            var dto = new List<PlayerEloProgressionDto>();
             
             for (int i = 0; i < players.Count; i++)
             {
                 var playerId = players[i].Id;
                 var player = players[i];
-                List<int> gamesPlayed = new List<int>();
+                var gamesPlayed = new List<int>();
 
                 var playerEloProgression = new PlayerEloProgressionDto
                 {

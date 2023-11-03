@@ -36,7 +36,7 @@ namespace Billy_BE.Controllers
                                 PlayerOneName = game.PlayerOne.Name,
                                 PlayerTwoName = game.PlayerTwo.Name,
                                 WinnerName = game.Winner.Name,
-                                TimeOfPlay = game.TimeOfPlay.AddHours(2)
+                                game.TimeOfPlay
                             }
                     )
                     .ToList();
@@ -47,6 +47,53 @@ namespace Billy_BE.Controllers
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
+        }
+        
+        [HttpGet("homefeed")]
+        public IActionResult GetGamesForHomeFeed()
+        {
+            try
+            {
+                var gamesPlayed = _billyContext.GamesPlayed
+                    .Include(game => game.PlayerOne)
+                    .Include(game => game.PlayerTwo)
+                    .Include(game => game.Winner)
+                    .ToList().Take(10);
+
+                var gamesWithElos = new List<object>();
+                    
+                    foreach(var game in gamesPlayed)
+                    {
+                        var x = new
+                        {
+                            game,
+                            newElos = CalculateEloChange(game.PlayerOne, game.PlayerTwo, game.Winner.Id)
+                        };
+                        
+                        gamesWithElos.Add(x); 
+                    }
+
+                return Ok(gamesWithElos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+        
+        [HttpGet("{id}")]
+        public IActionResult GetGame(int id)
+        {
+            var games = _billyContext.GamesPlayed.ToList();
+            
+            var selectedGame = games.FirstOrDefault(game => game.Id == id);
+            
+            if (selectedGame == null)
+            {
+                return NotFound("Game not found");
+            }
+
+            return Ok(selectedGame);
         }
 
         [HttpPost]
@@ -153,6 +200,40 @@ namespace Billy_BE.Controllers
                 playerTwo.LongestWinStreak,
                 playerTwo.CurrentWinStreak
             );
+        }
+        
+        private object CalculateEloChange(Player? playerOne, Player? playerTwo, int winnerId)
+        {
+            // Calculate Elo rating changes based on the game outcome
+            const int K = 32; // Elo rating adjustment constant
+
+            if (playerTwo == null)
+                return new {};
+            
+            if (playerOne == null)
+                return new {};
+            
+            var playerOneExpectedScore =
+                1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
+            var playerTwoExpectedScore = 1 - playerOneExpectedScore;
+
+            // Update Elo ratings based on the winner
+            if (winnerId == playerOne.Id)
+            {
+                playerOne.Rating += (int)(K * (1 - playerOneExpectedScore));
+                playerTwo.Rating += (int)(K * (0 - playerTwoExpectedScore));
+            }
+            else if (winnerId == playerTwo.Id)
+            {
+                playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
+                playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
+            }
+
+            return new
+            {
+                playerOneNewElo = playerOne.Rating,
+                playerTwoNewElo  = playerTwo.Rating
+            };
         }
 
         private void UpdateEloRatings(Player? playerOne, Player? playerTwo, int winnerId)
