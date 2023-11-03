@@ -80,26 +80,33 @@
 
     <div class="shadow-2xl feed">
         {#each data.gamesPlayed as game}
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div class="shadow-lg feed-element">
                 <span
                     style="display: flex; margin-bottom: 2px; height:20px; align-items: space-between; width: 100% "
                 >
                     <p class="feed-element-name">
                         {`${
-                            game.winnerName === game.playerOneName
-                                ? game.playerOneName
-                                : game.playerTwoName
+                            game.game.winner.id === game.game.playerOne.id
+                                ? game.game.playerOne.name
+                                : game.game.playerTwo.name
+                        }: ${
+                            game.game.winner.id === game.game.playerOne.id
+                                ? game.game.playerOneElo +
+                                  " -> " +
+                                  game.newElos.playerOneNewElo
+                                : game.game.playerTwoElo +
+                                  " -> " +
+                                  game.newElos.playerTwoNewElo
                         }`}
                     </p>
                     <p class="feed-time">
-                        {formatFeedDate(game.timeOfPlay)}
+                        {formatFeedDate(game.game.timeOfPlay)}
                     </p>
                     <p class="feed-element-name">
                         {`${
-                            game.winnerName === game.playerOneName
-                                ? game.playerTwoName
-                                : game.playerOneName
+                            game.game.winner.id === game.game.playerOne.id
+                                ? game.game.playerTwo.name
+                                : game.game.playerOne.name
                         }`}
                     </p>
                 </span>
