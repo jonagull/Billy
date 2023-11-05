@@ -1,12 +1,13 @@
 <script lang="ts">
     import crown from "$lib/assets/crown.png";
     import billyLogo from "$lib/assets//milkybilly.png";
-    import { baseUrl } from "$lib/constants";
     import type { PageData } from "./$types";
     import type { Player } from "$lib/interfaces";
     import { Alert, Button } from "stwui";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
+    import TheComboBox from "$lib/components/TheComboBox.svelte";
+    import { baseUrl } from "$lib/constants";
 
     export let data: PageData;
 
@@ -28,28 +29,20 @@
         availablePlayers = data.players;
     });
 
-    function handlePlayerOneSelect(event: any) {
-        const playerId = +event.target.value;
-        selectedPlayerOneId = playerId;
+    $: {
+        if (selectedPlayerOneId) {
+            selectedPlayerOne = data.players.find(
+                (player: { id: number | undefined }) =>
+                    player.id === selectedPlayerOneId
+            );
+        }
 
-        selectedPlayerOne = data.players.find(
-            (player: { id: number | undefined }) =>
-                player.id === selectedPlayerOneId
-        );
-
-        updateAvailablePlayers();
-    }
-
-    function handlePlayerTwoSelect(event: any) {
-        const playerId = +event.target.value;
-        selectedPlayerTwoId = playerId;
-
-        selectedPlayerTwo = data.players.find(
-            (player: { id: number | undefined }) =>
-                player.id === selectedPlayerTwoId
-        );
-
-        updateAvailablePlayers();
+        if (selectedPlayerTwoId) {
+            selectedPlayerTwo = data.players.find(
+                (player: { id: number | undefined }) =>
+                    player.id === selectedPlayerTwoId
+            );
+        }
     }
 
     function handleWinnerSelect(event: any) {
@@ -86,6 +79,7 @@
             playerTwoId: selectedPlayerTwoId,
             winnerId: winnerId,
         };
+
         try {
             const response = await fetch(baseUrl + "/Games", {
                 method: "POST",
@@ -170,60 +164,22 @@
 
         <form class="w-2/4 max-w-md p-6 mx-auto bg-white rounded shadow-md">
             <div class="mb-6">
-                <label
-                    for="playerOneSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Player One:</label
-                >
-                <select
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={selectedPlayerOneId}
-                    on:change={handlePlayerOneSelect}
-                >
-                    <option value="">Select Player One</option>
-                    {#each data.players as player}
-                        <option value={player.id}>{player.name}</option>
-                    {/each}
-                </select>
+                <!-- Player one  -->
+                <TheComboBox
+                    bind:player={selectedPlayerOneId}
+                    placeholder={"Player one"}
+                    players={data.mappedPlayers}
+                />
             </div>
 
             <div class="mb-6">
-                <label
-                    for="playerTwoSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Player Two:</label
-                >
-                <select
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={selectedPlayerTwoId}
-                    on:change={handlePlayerTwoSelect}
-                >
-                    <option value="">Select Player Two</option>
-                    {#each availablePlayers as player}
-                        <option value={player.id}>{player.name}</option>
-                    {/each}
-                </select>
+                <!-- Player two -->
+                <TheComboBox
+                    bind:player={selectedPlayerTwoId}
+                    placeholder={"Player two"}
+                    players={data.mappedPlayers}
+                />
             </div>
-
-            <div class="mb-6">
-                <label
-                    for="winnerSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Winner:</label
-                >
-                <select
-                    id="winnerSelect"
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={winnerId}
-                    on:change={handleWinnerSelect}
-                >
-                    <option value="">Select Winner</option>
-                    {#each [selectedPlayerOne, selectedPlayerTwo] as player}
-                        <option value={player?.id}>{player?.name}</option>
-                    {/each}
-                </select>
-            </div>
-
             <div class="text-center">
                 <!-- svelte-ignore a11y-missing-attribute -->
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
