@@ -1,22 +1,22 @@
 <script lang="ts">
     import crown from "$lib/assets/crown.png";
     import billyLogo from "$lib/assets//milkybilly.png";
-    import { baseUrl } from "$lib/constants";
     import type { PageData } from "./$types";
     import type { Player } from "$lib/interfaces";
     import { Alert, Button } from "stwui";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
+    import TheComboBox from "$lib/components/TheComboBox.svelte";
+    import { baseUrl } from "$lib/constants";
 
     export let data: PageData;
 
     let winnerId: number | undefined;
-    let players: Player[] = [];
     let selectedPlayerOneId: number | undefined;
     let selectedPlayerOne: Player | undefined;
     let selectedPlayerTwoId: number | undefined;
     let selectedPlayerTwo: Player | undefined;
-    let availablePlayers: Player[] = [];
+    let availablePlayers: any[] = [];
     let playerOneRatingChange: number;
     let playerTwoRatingChange: number;
     let showAlert = false;
@@ -25,31 +25,25 @@
     let gameResult: string | undefined;
 
     onMount(() => {
-        availablePlayers = data.players;
+        availablePlayers = data.mappedPlayers;
     });
 
-    function handlePlayerOneSelect(event: any) {
-        const playerId = +event.target.value;
-        selectedPlayerOneId = playerId;
+    $: {
+        if (selectedPlayerOneId) {
+            selectedPlayerOne = data.players.find(
+                (player: { id: number | undefined }) =>
+                    player.id === selectedPlayerOneId
+            );
 
-        selectedPlayerOne = data.players.find(
-            (player: { id: number | undefined }) =>
-                player.id === selectedPlayerOneId
-        );
+            updateAvailablePlayers();
+        }
 
-        updateAvailablePlayers();
-    }
-
-    function handlePlayerTwoSelect(event: any) {
-        const playerId = +event.target.value;
-        selectedPlayerTwoId = playerId;
-
-        selectedPlayerTwo = data.players.find(
-            (player: { id: number | undefined }) =>
-                player.id === selectedPlayerTwoId
-        );
-
-        updateAvailablePlayers();
+        if (selectedPlayerTwoId) {
+            selectedPlayerTwo = data.players.find(
+                (player: { id: number | undefined }) =>
+                    player.id === selectedPlayerTwoId
+            );
+        }
     }
 
     function handleWinnerSelect(event: any) {
@@ -63,11 +57,11 @@
         updateAvailablePlayers();
     }
 
-    function updateAvailablePlayers() {
-        availablePlayers = data.players.filter(
+    const updateAvailablePlayers = () => {
+        availablePlayers = data.mappedPlayers.filter(
             (player: any) => player.id !== selectedPlayerOneId
         );
-    }
+    };
 
     function updateGameResultString() {
         if (winnerId === selectedPlayerOne?.id) {
@@ -77,7 +71,7 @@
     }
 
     async function submitForm() {
-        if (!winnerId) {
+        if (!winnerId || selectedPlayerOneId === selectedPlayerTwoId) {
             return;
         }
 
@@ -86,6 +80,7 @@
             playerTwoId: selectedPlayerTwoId,
             winnerId: winnerId,
         };
+
         try {
             const response = await fetch(baseUrl + "/Games", {
                 method: "POST",
@@ -164,198 +159,185 @@
     </div>
 </dialog>
 
-<main>
-    <div class="flex flex-col items-center">
-        <img src={billyLogo} alt="Pool sticks in cross" width="100px" />
+<div class="flex flex-col items-center">
+    <img
+        src={billyLogo}
+        alt="Pool sticks in cross"
+        width="100px"
+        class="mb-3"
+    />
 
-        <form class="w-2/4 max-w-md p-6 mx-auto bg-white rounded shadow-md">
-            <div class="mb-6">
-                <label
-                    for="playerOneSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Player One:</label
-                >
-                <select
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={selectedPlayerOneId}
-                    on:change={handlePlayerOneSelect}
-                >
-                    <option value="">Select Player One</option>
-                    {#each data.players as player}
-                        <option value={player.id}>{player.name}</option>
-                    {/each}
-                </select>
-            </div>
+    <form class="w-2/4 max-w-md p-6 mx-auto bg-white rounded shadow-2xl">
+        <div class="mb-6">
+            <!-- Player one  -->
+            <TheComboBox
+                bind:player={selectedPlayerOneId}
+                placeholder={"Player one"}
+                players={data.mappedPlayers}
+            />
+        </div>
 
-            <div class="mb-6">
-                <label
-                    for="playerTwoSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Player Two:</label
-                >
-                <select
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={selectedPlayerTwoId}
-                    on:change={handlePlayerTwoSelect}
-                >
-                    <option value="">Select Player Two</option>
-                    {#each availablePlayers as player}
-                        <option value={player.id}>{player.name}</option>
-                    {/each}
-                </select>
-            </div>
+        <div class="mb-6">
+            <!-- Player two -->
+            <TheComboBox
+                bind:player={selectedPlayerTwoId}
+                placeholder={"Player two"}
+                players={availablePlayers}
+            />
+        </div>
+    </form>
 
-            <div class="mb-6">
-                <label
-                    for="winnerSelect"
-                    class="block mb-2 text-sm font-bold text-gray-700"
-                    >Winner:</label
+    <div class="flex justify-center mt-10">
+        <div class="w-1/2">
+            <Button
+                on:click={() =>
+                    handleWinnerSelect({
+                        target: { value: selectedPlayerOneId },
+                    })}
+            >
+                <div
+                    class={`${
+                        winnerId && winnerId === selectedPlayerOne?.id
+                            ? "bg-green-200"
+                            : ""
+                    }  rounded shadow-md p-4 shadow-lg player-card `}
                 >
-                <select
-                    id="winnerSelect"
-                    class="block w-full p-2 border border-gray-300 rounded form-select"
-                    bind:value={winnerId}
-                    on:change={handleWinnerSelect}
-                >
-                    <option value="">Select Winner</option>
-                    {#each [selectedPlayerOne, selectedPlayerTwo] as player}
-                        <option value={player?.id}>{player?.name}</option>
-                    {/each}
-                </select>
-            </div>
-
-            <div class="text-center">
-                <!-- svelte-ignore a11y-missing-attribute -->
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <a
-                    class="relative inline-block text-lg group"
-                    style="width: 145px;"
-                    on:click={() => {
-                        dialog.showModal();
-                        updateGameResultString();
-                    }}
-                >
-                    <span
-                        class="relative z-10 block px-5 py-3 overflow-hidden font-medium leading-tight text-gray-800 transition-colors duration-300 ease-out border-2 border-gray-900 rounded-lg group-hover:text-white"
-                    >
-                        <span
-                            class="absolute inset-0 w-full h-full px-5 py-3 rounded-lg bg-gray-50"
-                        />
-                        <span
-                            class="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-gray-900 group-hover:-rotate-180 ease"
-                        />
-                        <span class="relative">Submit</span>
+                    <h2 class="mb-1 text-2xl font-bold">
+                        {selectedPlayerOne?.name || "Player one"}
+                    </h2>
+                    <hr class="mb-2" />
+                    <span class="flex">
+                        <p>
+                            Elo: {selectedPlayerOne?.rating || "N/A"}
+                        </p>
+                        {#if playerOneRatingChange}
+                            <p
+                                class={playerOneRatingChange > 0
+                                    ? "green-text"
+                                    : "red-text"}
+                            >
+                                {playerOneRatingChange > 0
+                                    ? `+${playerOneRatingChange}`
+                                    : `${playerOneRatingChange}`}
+                            </p>
+                        {/if}
                     </span>
-                    <span
-                        class="absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear bg-gray-900 rounded-lg group-hover:mb-0 group-hover:mr-0"
-                        data-rounded="rounded-lg"
-                    />
-                </a>
-            </div>
-        </form>
-
-        <div class="flex justify-center mt-10">
-            <div class="w-1/2">
-                {#if selectedPlayerOne}
-                    <Button
-                        on:click={() =>
-                            handleWinnerSelect({
-                                target: { value: selectedPlayerOneId },
-                            })}
-                    >
-                        <div
-                            class={`${
-                                winnerId === selectedPlayerOne.id
-                                    ? "bg-green-200"
-                                    : ""
-                            }  rounded shadow-md p-4 shadow-lg `}
-                        >
-                            <h2 class="mb-4 text-2xl font-bold">
-                                {selectedPlayerOne.name}
-                            </h2>
-                            <span class="flex">
-                                <p>
-                                    Elo: {selectedPlayerOne.rating}
-                                </p>
-                                {#if playerOneRatingChange}
-                                    <p
-                                        class={playerOneRatingChange > 0
-                                            ? "green-text"
-                                            : "red-text"}
-                                    >
-                                        {playerOneRatingChange > 0 ? " +" : " "}
-                                        {playerOneRatingChange}
-                                    </p>
-                                {/if}
-                            </span>
-                            <p>
-                                Games played: {selectedPlayerOne.gamesPlayed}
-                            </p>
-                        </div>
-                    </Button>
-                {/if}
-            </div>
-
-            {#if selectedPlayerOne && selectedPlayerTwo}
-                <div class="flex items-center mx-4">
-                    <h1 class="text-4xl font-bold">VS</h1>
+                    <span class="flex">
+                        <p class="flex">
+                            Games: {selectedPlayerOne?.gamesPlayed || "N/A"}
+                        </p>
+                        {#if playerOneRatingChange}
+                            <p class="green-text">+1</p>
+                        {/if}
+                    </span>
                 </div>
-            {/if}
+            </Button>
+        </div>
 
-            <div class="w-1/2">
-                {#if selectedPlayerTwo}
-                    <Button
-                        on:click={() =>
-                            handleWinnerSelect({
-                                target: { value: selectedPlayerTwoId },
-                            })}
-                    >
-                        <div
-                            class={`${
-                                winnerId === selectedPlayerTwo.id
-                                    ? "bg-green-200"
-                                    : ""
-                            }  rounded shadow-md p-4 shadow-lg `}
-                        >
-                            <h2 class="mb-4 text-2xl font-bold">
-                                {selectedPlayerTwo.name}
-                            </h2>
-                            <span class="flex">
-                                <p>
-                                    Elo: {selectedPlayerTwo.rating}
-                                </p>
-                                {#if playerTwoRatingChange}
-                                    <p
-                                        class={playerTwoRatingChange > 0
-                                            ? "green-text"
-                                            : "red-text"}
-                                    >
-                                        {playerTwoRatingChange > 0
-                                            ? "" + " +"
-                                            : " "}
-                                        {playerTwoRatingChange}
-                                    </p>
-                                {/if}
-                            </span>
-                            <p>
-                                Games played: {selectedPlayerTwo.gamesPlayed}
+        <div class="flex items-center mx-4">
+            <h1 class="text-4xl font-bold">VS</h1>
+        </div>
+
+        <div class="w-1/2">
+            <Button
+                on:click={() =>
+                    handleWinnerSelect({
+                        target: { value: selectedPlayerTwoId },
+                    })}
+            >
+                <div
+                    class={`${
+                        winnerId && winnerId === selectedPlayerTwo?.id
+                            ? "bg-green-200"
+                            : ""
+                    }  rounded shadow-md p-4 shadow-lg player-card `}
+                >
+                    <h2 class="mb-1 text-2xl font-bold">
+                        {selectedPlayerTwo?.name || "Player two"}
+                    </h2>
+                    <hr class="mb-2" />
+                    <span class="flex">
+                        <p>
+                            Elo: {selectedPlayerTwo?.rating || "N/A"}
+                        </p>
+                        {#if playerTwoRatingChange}
+                            <p
+                                class={playerTwoRatingChange > 0
+                                    ? "green-text"
+                                    : "red-text"}
+                            >
+                                {playerTwoRatingChange > 0
+                                    ? `+${playerTwoRatingChange}`
+                                    : `${playerTwoRatingChange}`}
                             </p>
-                        </div>
-                    </Button>
-                {/if}
-            </div>
+                        {/if}
+                    </span>
+                    <span class="flex">
+                        <p class="flex">
+                            Games: {selectedPlayerTwo?.gamesPlayed || "N/A"}
+                        </p>
+                        {#if playerTwoRatingChange}
+                            <p class="green-text">+1</p>
+                        {/if}
+                    </span>
+                </div>
+            </Button>
         </div>
     </div>
-</main>
 
-<style>
+    <!-- Submit button -->
+    <div class="text-center" style="margin-top: 20px">
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <a
+            class="relative inline-block text-lg group"
+            style="width: 145px;"
+            on:click={() => {
+                if (!winnerId) {
+                    return;
+                }
+
+                dialog.showModal();
+                updateGameResultString();
+            }}
+        >
+            <span
+                class="relative z-10 block px-5 py-3 overflow-hidden font-medium leading-tight text-gray-800 transition-colors duration-300 ease-out border-2 border-gray-900 rounded-lg group-hover:text-white"
+            >
+                <span
+                    class="absolute inset-0 w-full h-full px-5 py-3 rounded-lg bg-gray-50"
+                />
+                <span
+                    class="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-gray-900 group-hover:-rotate-180 ease"
+                />
+                <span class="relative">{winnerId ? "Submit" : "Select"}</span>
+            </span>
+            <span
+                class="absolute bottom-0 right-0 w-full h-12 -mb-1 -mr-1 transition-all duration-200 ease-linear bg-gray-900 rounded-lg group-hover:mb-0 group-hover:mr-0"
+                data-rounded="rounded-lg"
+            />
+        </a>
+    </div>
+</div>
+
+<style lang="scss">
     .alert {
         position: fixed;
         top: 10%;
         right: 20px;
         z-index: 1000;
         width: 400px;
+    }
+
+    .player-card {
+        width: 200px;
+        height: 150px;
+
+        p {
+            font-size: 17px;
+            text-align: left;
+        }
     }
 
     .dialog {
