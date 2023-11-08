@@ -18,6 +18,8 @@ export const load = (async () => {
         players: response.sort((a: any, b: any) =>
             a.name.localeCompare(b.name)
         ),
-        mappedPlayers: players,
+        mappedPlayers: players.sort((a: any, b: any) =>
+            a.label.localeCompare(b.label)
+        ),
     };
 }) satisfies PageLoad;
