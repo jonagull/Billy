@@ -53,11 +53,11 @@
                     : undefined}
             >
                 <a href="/chart">Chart</a>
-                <div
+                <!-- <div
                     class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-0 -right-0 dark:border-gray-900"
                 >
                     !
-                </div>
+                </div> -->
             </li>
 
             <li

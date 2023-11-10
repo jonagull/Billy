@@ -1,6 +1,7 @@
 <script lang="ts">
     import crown from "$lib/assets/crown.png";
     import billyLogo from "$lib/assets//milkybilly.png";
+    import fingerPointing from "$lib/assets/fingerpoint.png";
     import type { PageData } from "./$types";
     import type { Player } from "$lib/interfaces";
     import { Alert, Button } from "stwui";
@@ -23,6 +24,7 @@
     let gameFact: string;
     let dialog: HTMLDialogElement;
     let gameResult: string | undefined;
+    let showHand: boolean = true;
 
     onMount(() => {
         availablePlayers = data.mappedPlayers;
@@ -97,6 +99,7 @@
                 selectedPlayerOneId = undefined;
                 selectedPlayerTwoId = undefined;
                 winnerId = undefined;
+                showHand = false;
                 const data = await response.json();
                 playerOneRatingChange = data.playerOne.ratingDiff;
                 playerTwoRatingChange = data.playerTwo.ratingDiff;
@@ -188,7 +191,15 @@
     </form>
 
     <div class="flex justify-center mt-10">
-        <div class="w-1/2">
+        <div class="w-1/2" style="position: relative;">
+            {#if selectedPlayerOneId && selectedPlayerTwoId && showHand}
+                <img
+                    src={fingerPointing}
+                    alt="fingerp pointing"
+                    width="300"
+                    style="rotate: 45deg; z-index: 1000; position: absolute; left: -190px; top: -70px; "
+                />
+            {/if}
             <Button
                 on:click={() =>
                     handleWinnerSelect({
