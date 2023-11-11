@@ -131,12 +131,11 @@
 
 <style>
     .feed {
-        margin: 0 200px;
+        margin: 0 350px;
         padding: 50px 0;
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: 1px solid black;
         border-radius: 20px;
     }
 
@@ -144,7 +143,6 @@
         border-radius: 20px;
         width: 550px;
         padding: 10px;
-        border: 1px solid black;
         display: flex;
         flex-direction: column;
         align-items: center;

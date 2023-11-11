@@ -5,6 +5,15 @@ import type { PageLoad } from "./$types";
 export const load = (async () => {
     const data = await fetchPageData("players/elos");
 
+    const players = data.map((x: any) => {
+        return {
+            label: x.player.name,
+            value: x.player.rating,
+            id: x.player.id,
+            disabled: false,
+        };
+    });
+
     const lengths = data.map((a: any) => a.length);
     lengths.indexOf(Math.max(...lengths));
 
@@ -38,7 +47,7 @@ export const load = (async () => {
         labels: eloIndexLabels,
         datasets: data.map((x: PlayerEloProgression) => {
             return {
-                label: x.player.name + " elo history",
+                label: x.player.name,
                 fill: true,
                 lineTension: 0.1,
                 backgroundColor: "rgba(225, 204,230, .3)",
@@ -63,5 +72,6 @@ export const load = (async () => {
 
     return {
         playerElosLineData: playerEloLineData,
+        players: players,
     };
 }) satisfies PageLoad;

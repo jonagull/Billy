@@ -9,6 +9,7 @@
     import { baseUrl } from "$lib/constants";
     import { columns } from "./TheTableColumns";
     import { formatDateTime } from "$lib/helpers/dates";
+    import { invalidateAll } from "$app/navigation";
 
     let base_url: string;
     let orderBy: string;
@@ -47,6 +48,7 @@
                 if (response.ok) {
                     console.log("Player added successfully");
                     playerName = ""; // Reset the player name
+                    invalidateAll();
                 } else {
                     console.error("Failed to add player");
                 }
@@ -71,7 +73,7 @@
     }
 </script>
 
-<Card bordered={false} class="h-[calc(100vh-14rem)]">
+<Card bordered={false} class="h-[calc(100vh-14rem)] ">
     <Card.Header
         slot="header"
         class="font-bold text-lg flex justify-between items-center py-3"

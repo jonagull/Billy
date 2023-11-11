@@ -5,4 +5,6 @@
     export let data: PageData;
 </script>
 
-<TheTable players={data.players} />
+<div class="shadow-2xl">
+    <TheTable players={data.players} />
+</div>
