@@ -4,7 +4,6 @@
     import TheComboBox from "$lib/components/TheComboBox.svelte";
     import { onMount } from "svelte";
     import { invalidateAll } from "$app/navigation";
-    import cross from "$lib/assets/icons/x-cross.svg";
 
     export let data: PageData;
 
@@ -96,7 +95,6 @@
         {#each selectedPlayers as sp}
             <button class="sp-button" on:click={() => removePlayer(sp.id)}>
                 {sp.label}
-                <img src={cross} alt="cross exit" class="button-image" />
             </button>
         {/each}
     </div>
