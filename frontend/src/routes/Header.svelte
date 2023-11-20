@@ -75,6 +75,18 @@
             >
                 <a href="/rules">Rules</a>
             </li>
+            <li
+                aria-current={$page.url.pathname === "/changelog"
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/changelog">Changelog</a>
+                <div
+                    class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-0 -right-0 dark:border-gray-900"
+                >
+                    !
+                </div>
+            </li>
         </ul>
         <svg viewBox="0 0 2 3" aria-hidden="true">
             <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />
