@@ -36,7 +36,7 @@ namespace Billy_BE.Controllers
                                 PlayerOneName = game.PlayerOne.Name,
                                 PlayerTwoName = game.PlayerTwo.Name,
                                 WinnerName = game.Winner.Name,
-                                TimeOfPlay = game.TimeOfPlay.AddHours(2)
+                                TimeOfPlay = game.TimeOfPlay.AddHours(1)
                             }
                     )
                     .ToList();
