@@ -6,6 +6,7 @@ export const load = (async ({ params }) => {
     const playerResponse: PlayerProfile = await fetchPageData(
         "Players/" + params.id
     );
+
     const playersResponse: Player[] = await fetchPageData("Players");
 
     const playerGameElos = playerResponse.gamesPlayed.map((x) =>
@@ -48,6 +49,7 @@ export const load = (async ({ params }) => {
         gamesPlayed: playerResponse.gamesPlayed.reverse(),
         player: playerResponse.player,
         lineData: playerEloLineData,
+        opponents: playerResponse.opponents,
         players: playersResponse.sort((a: any, b: any) =>
             a.name.localeCompare(b.name)
         ),

@@ -24,9 +24,16 @@ export interface GamePlayed {
 export interface PlayerProfile {
     player: Player;
     gamesPlayed: GamePlayed[];
+    opponents: Opponent[];
 }
 
 export interface PlayerEloProgression {
     player: Player;
     elos: number[];
+}
+
+export interface Opponent {
+    name?: string;
+    gamesAgainst?: number;
+    winRatio?: number;
 }

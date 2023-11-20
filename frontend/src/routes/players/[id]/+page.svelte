@@ -129,6 +129,20 @@
                 <Input.Label slot="label">{metric.label}</Input.Label>
             </Input>
         {/each}
+
+        {#if data.opponents.length > 0}
+            <hr style="margin-top: 20px" />
+            <div
+                style="display: flex; flex-direction: column; margin-top: 20px;"
+            >
+                <h2 style="font-size: 20px">
+                    <strong>Opponents</strong>
+                </h2>
+                {#each data.opponents as opponent}
+                    <span>{opponent.name}: {opponent.gamesAgainst}</span>
+                {/each}
+            </div>
+        {/if}
     </div>
 {/if}
 

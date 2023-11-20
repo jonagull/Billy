@@ -116,6 +116,8 @@ namespace Billy_BE.Controllers
         public async Task<ActionResult<PlayerProfileDto>> GetPlayer(int id)
         {
             var player = await _context.Players.FindAsync(id);
+            var opponents = new List<Opponent>();
+            var temp = new List<Object>();
 
             var gamesPlayed = await _context.GamesPlayed
                 .Include(game => game.PlayerOne)
@@ -123,16 +125,39 @@ namespace Billy_BE.Controllers
                 .Include(game => game.Winner)
                 .Where(game => game.PlayerOne.Id == id || game.PlayerTwo.Id == id)
                 .ToListAsync();
-
+            
             if (player == null)
             {
                 return NotFound();
             }
+            
+            // Loop through games
+            foreach (var g in gamesPlayed)
+            {
+                // Add the players from that game that is not the player
+                temp.Add(g.PlayerOne.Id == id ? g.PlayerTwo.Name : g.PlayerOne.Name);
+            }
+            
+            var grouped = temp.GroupBy(t => t);
 
+            foreach (var gr in grouped)
+            {
+                var groupCount = gr.Count();
+                
+                var opponent = new Opponent
+                {
+                    Name = gr.Key.ToString(),
+                    GamesAgainst  = groupCount
+                };
+                
+                opponents.Add(opponent);
+            }
+            
             var dto = new PlayerProfileDto
             {
                 Player = player,
-                GamesPlayed = gamesPlayed
+                GamesPlayed = gamesPlayed,
+                Opponents = opponents
             };
 
             return Ok(dto);
