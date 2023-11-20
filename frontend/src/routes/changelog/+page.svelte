@@ -1,11 +1,38 @@
+<script lang="ts">
+    const changelog = [
+        {
+            title: "8. Nov 2023 - Changed flow for logging games",
+            text: "Added combobox, changed layout for gamelogging",
+        },
+        {
+            title: "11. Nov 2023 - Combobox",
+            text: "Added multi combobox to chart page, now you can include players you want to compare in chart instead of excluding all the players you dont want to see",
+        },
+        {
+            title: "20. Nov 2023 - Added opponents",
+            text: "Added opponents to player profile, under metrics - so now you can see gamesplayed count against other players",
+        },
+    ];
+</script>
+
 <h1>Changelog</h1>
 
 <hr style="margin: 20px 0" />
 
-<h2>
-    <strong> 20. Nov 2023 - Added opponents</strong>
-</h2>
-<p>
-    Added opponents to player profile, under metrics - so now you can see
-    gamesplayed count against other players
-</p>
+<article class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+        class="prose mt-10 mb-10 sm:prose-sm md:prose-md lg:prose-lg xl:prose-xl mx-auto table-responsive"
+    >
+        {#each changelog.reverse() as cl}
+            <div style="margin-top: 10px">
+                <h2>
+                    <strong>{cl.title}</strong>
+                </h2>
+                <p>
+                    {cl.text}
+                </p>
+                <hr style="margin-top: 10px" />
+            </div>
+        {/each}
+    </div>
+</article>
