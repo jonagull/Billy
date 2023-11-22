@@ -12,6 +12,10 @@
             title: "20. Nov 2023 - Added opponents",
             text: "Added opponents to player profile, under metrics - so now you can see gamesplayed count against other players",
         },
+        {
+            title: "22. Nov 2023 - Pagination",
+            text: "Added pagination to feed page, now you can see more than 10 games at a time",
+        },
     ];
 </script>
 

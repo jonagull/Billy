@@ -1,5 +1,6 @@
 <script lang="ts">
     import TheFeedBox from "$lib/components/TheFeedBox.svelte";
+    import ThePaginationNav from "$lib/components/ThePaginationNav.svelte";
     import type { PageData } from "./$types";
 
     export let data: PageData;
@@ -11,6 +12,12 @@
             <TheFeedBox {game} showNumber />
         {/each}
     </div>
+
+    <ThePaginationNav
+        totalGames={data.totalGames}
+        currentPage={data.currentPage}
+        pageSize={data.pageSize}
+    />
 </section>
 
 <style>
