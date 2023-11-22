@@ -17,14 +17,19 @@ namespace Billy_BE.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllGamesPlayed()
+        public IActionResult GetAllGamesPlayed(int page = 1, int pageSize = 10)
         {
             try
             {
+                var totalGames = _billyContext.GamesPlayed.Count();
+
                 var gamesPlayed = _billyContext.GamesPlayed
                     .Include(game => game.PlayerOne)
                     .Include(game => game.PlayerTwo)
                     .Include(game => game.Winner)
+                    .OrderByDescending(game => game.Id) // Order by Id in descending order
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToList();
 
                 var gamesWithNames = gamesPlayed
@@ -41,13 +46,22 @@ namespace Billy_BE.Controllers
                     )
                     .ToList();
 
-                return Ok(gamesWithNames);
+                var response = new
+                {
+                    TotalGames = totalGames,
+                    PageSize = pageSize,
+                    CurrentPage = page,
+                    Games = gamesWithNames
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> LogGame(GamePlayedDto gameDto)
