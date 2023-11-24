@@ -3,6 +3,7 @@
     import TheFeedBox from "$lib/components/TheFeedBox.svelte";
     import TheButton from "$lib/components/TheButton.svelte";
     import { quotes } from "$lib/data/quotes";
+
     import type { PageData } from "./$types";
 
     export let data: PageData;
@@ -36,7 +37,7 @@
 
     <div class="shadow-2xl feed">
         {#each data.gamesPlayed as game}
-            <TheFeedBox {game} />
+            <TheFeedBox {game} isHomeFeed />
         {/each}
 
         <TheButton href={"feed"} label={"See more"} />
