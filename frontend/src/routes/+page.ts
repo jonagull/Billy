@@ -1,14 +1,13 @@
 import { baseUrl } from "$lib/constants";
-import { fetchPageData } from "$lib/helpers/api";
 import type { PageLoad } from "./$types";
 
 export const load = (async () => {
-    const endpoint = "Games?page=1&pageSize=6";
+    const endpoint = "games/homefeed";
     const res = await fetch(`${baseUrl}/${endpoint}`);
 
-    const gamesPlayed = await res.json();
+    const response = await res.json();
 
     return {
-        gamesPlayed: gamesPlayed.games,
+        gamesPlayed: response,
     };
 }) satisfies PageLoad;

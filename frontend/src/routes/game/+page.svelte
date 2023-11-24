@@ -1,5 +1,4 @@
 <script lang="ts">
-    import crown from "$lib/assets/crown.png";
     import billyLogo from "$lib/assets//milkybilly.png";
     import fingerPointing from "$lib/assets/fingerpoint.png";
     import type { PageData } from "./$types";
@@ -9,6 +8,8 @@
     import { fade, fly } from "svelte/transition";
     import TheComboBox from "$lib/components/TheComboBox.svelte";
     import { baseUrl } from "$lib/constants";
+    import TheProgressBar from "$lib/components/TheProgressBar.svelte";
+    import TheRevertButton from "$lib/components/TheRevertButton.svelte";
 
     export let data: PageData;
 
@@ -22,9 +23,13 @@
     let playerTwoRatingChange: number;
     let showAlert = false;
     let gameFact: string;
-    let dialog: HTMLDialogElement;
     let gameResult: string | undefined;
     let showHand: boolean = true;
+    let showRevert: boolean = false;
+    let gameId: number;
+    let isReverting: boolean = false;
+    let logError: string = "Error logging game!";
+    let showError: boolean = false;
 
     onMount(() => {
         availablePlayers = data.mappedPlayers;
@@ -72,7 +77,20 @@
             gameResult = `${selectedPlayerTwo?.name} beat ${selectedPlayerOne?.name}!`;
     }
 
-    async function submitForm() {
+    async function logGame() {
+        if (
+            (selectedPlayerOne && !selectedPlayerTwo) ||
+            (!selectedPlayerOne && selectedPlayerTwo)
+        ) {
+            logError = "You need to select two players!";
+            showError = true;
+
+            setTimeout(() => {
+                showError = false;
+            }, 7000);
+            return;
+        }
+
         if (!winnerId || selectedPlayerOneId === selectedPlayerTwoId) {
             return;
         }
@@ -98,16 +116,26 @@
                 showAlert = true;
                 selectedPlayerOneId = undefined;
                 selectedPlayerTwoId = undefined;
-                winnerId = undefined;
                 showHand = false;
                 const data = await response.json();
                 playerOneRatingChange = data.playerOne.ratingDiff;
                 playerTwoRatingChange = data.playerTwo.ratingDiff;
                 gameFact = data.gameFact;
+                showRevert = true;
+                gameId = data.gameId;
 
                 setTimeout(() => {
                     showAlert = false;
                 }, 7000);
+
+                setTimeout(() => {
+                    showRevert = false;
+                    selectedPlayerOne = undefined;
+                    selectedPlayerTwo = undefined;
+                    playerOneRatingChange = 0;
+                    playerTwoRatingChange = 0;
+                    winnerId = undefined;
+                }, 10000);
             } else {
                 // Handle error response
                 console.error("Failed to submit game.");
@@ -121,7 +149,7 @@
 {#if showAlert}
     <div class="alert" in:fly={{ y: 200, duration: 2000 }} out:fade>
         <Alert type="success">
-            <Alert.Title slot="title">Game logged!</Alert.Title>
+            <Alert.Title slot="title">Success</Alert.Title>
             <Alert.Description slot="description" class="italic"
                 >{gameFact}</Alert.Description
             >
@@ -129,38 +157,16 @@
     </div>
 {/if}
 
-<dialog
-    class="dialog relative w-full max-w-md max-h-full rounded"
-    bind:this={dialog}
-    in:fly={{ y: 200, duration: 2000 }}
-    out:fade
->
-    <div class="flex items-start justify-between p-4 border-b rounded-t">
-        <h3 class="text-xl font-semibold text-gray-700">Confirm Game</h3>
+{#if showError}
+    <div class="alert" in:fly={{ y: 200, duration: 2000 }} out:fade>
+        <Alert type="error">
+            <Alert.Title slot="title">Error!</Alert.Title>
+            <Alert.Description slot="description" class="italic"
+                >{logError}</Alert.Description
+            >
+        </Alert>
     </div>
-
-    <div class="p-6 space-y-6">
-        <div class="flex items-center space-x-1">
-            <img src={crown} alt="Crown" class="w-6 h-6" />
-            <p class="mb-auto text-base font-semibold text-gray-700">
-                {gameResult}
-            </p>
-        </div>
-        <p class="text-base font-normal text-gray-700" />
-        Are you sure you want to log this game?
-    </div>
-
-    <div class="flex items-center p-4 space-x-2 border-t rounded-b">
-        <Button
-            type="primary"
-            on:click={() => {
-                submitForm();
-                dialog.close();
-            }}>Confirm</Button
-        >
-        <Button type="danger" on:click={() => dialog.close()}>Cancel</Button>
-    </div>
-</dialog>
+{/if}
 
 <div class="flex flex-col items-center">
     <img
@@ -213,10 +219,9 @@
                             : ""
                     }  rounded shadow-md p-4 shadow-lg player-card `}
                 >
-                    <h2 class="mb-1 text-2xl font-bold">
+                    <h2 class="mb-3 text-2xl font-bold">
                         {selectedPlayerOne?.name || "Player one"}
                     </h2>
-                    <hr class="mb-2" />
                     <span class="flex">
                         <p>
                             Elo: {selectedPlayerOne?.rating || "N/A"}
@@ -263,10 +268,9 @@
                             : ""
                     }  rounded shadow-md p-4 shadow-lg player-card `}
                 >
-                    <h2 class="mb-1 text-2xl font-bold">
+                    <h2 class="mb-3 text-2xl font-bold">
                         {selectedPlayerTwo?.name || "Player two"}
                     </h2>
-                    <hr class="mb-2" />
                     <span class="flex">
                         <p>
                             Elo: {selectedPlayerTwo?.rating || "N/A"}
@@ -308,8 +312,7 @@
                 if (!winnerId) {
                     return;
                 }
-
-                dialog.showModal();
+                logGame();
                 updateGameResultString();
             }}
         >
@@ -330,9 +333,25 @@
             />
         </a>
     </div>
+    {#if showRevert || isReverting}
+        <div
+            class="progress-bar"
+            transition:fade={{ delay: 250, duration: 300 }}
+        >
+            <!-- <div class="progress-bar"> -->
+            <TheProgressBar />
+            <TheRevertButton bind:isReverting {gameId} />
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
+    .progress-bar {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .alert {
         position: fixed;
         top: 10%;
@@ -349,13 +368,6 @@
             font-size: 17px;
             text-align: left;
         }
-    }
-
-    .dialog {
-        position: absolute;
-        top: -2%;
-        z-index: 1000;
-        width: 400px;
     }
 
     .green-text {

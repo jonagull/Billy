@@ -6,6 +6,8 @@
     export let data: PageData;
 </script>
 
+<h1>Feed</h1>
+
 <section>
     <div class="shadow-2xl feed">
         {#each data.gamesPlayed as game}

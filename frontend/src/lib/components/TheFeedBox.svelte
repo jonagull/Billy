@@ -1,17 +1,51 @@
 <script lang="ts">
     import { formatFeedDate } from "$lib/helpers/dates";
+    import { createTooltip, melt } from "@melt-ui/svelte";
+    import { fade } from "svelte/transition";
+    import FeedBoxDetails from "./FeedBoxDetails.svelte";
 
     export let game: any;
     export let showNumber: boolean = false;
+    export let isHomeFeed: boolean = false;
+
+    const {
+        elements: { trigger, content, arrow },
+        states: { open },
+    } = createTooltip({
+        positioning: {
+            placement: "top",
+        },
+        openDelay: 0,
+        closeDelay: 0,
+        closeOnPointerDown: false,
+        forceVisible: true,
+    });
 </script>
+
+{#if $open && isHomeFeed}
+    <div
+        use:melt={$content}
+        transition:fade={{ duration: 100 }}
+        class="z-10 rounded-lg bg-white shadow"
+    >
+        <div use:melt={$arrow} />
+
+        <FeedBoxDetails data={game} />
+    </div>
+{/if}
 
 <div class="shadow-lg feed-element">
     <span
-        style="display: flex; margin-bottom: 2px; height:20px; align-items: space-between; width: 100% "
+        style="display: flex; margin-bottom: 2px; height:20px; align-items: space-between; width: 100%;"
+        use:melt={$trigger}
     >
         <p class="feed-element-name">
             {`${
-                game.winnerName === game.playerOneName
+                isHomeFeed
+                    ? game.game.winner.name === game.game.playerOne.name
+                        ? game.game.playerOne.name
+                        : game.game.playerTwo.name
+                    : game.winnerName === game.playerOneName
                     ? game.playerOneName
                     : game.playerTwoName
             }`}
@@ -22,12 +56,18 @@
             {/if}
 
             <p class="feed-time">
-                {formatFeedDate(game.timeOfPlay)}
+                {formatFeedDate(
+                    isHomeFeed ? game.game.timeOfPlay : game.timeOfPlay
+                )}
             </p>
         </div>
         <p class="feed-element-name">
             {`${
-                game.winnerName === game.playerOneName
+                isHomeFeed
+                    ? game.game.winner.name === game.game.playerOne.name
+                        ? game.game.playerTwo.name
+                        : game.game.playerOne.name
+                    : game.winnerName === game.playerOneName
                     ? game.playerTwoName
                     : game.playerOneName
             }`}
@@ -35,7 +75,14 @@
     </span>
 </div>
 
-<style>
+<style lang="postcss">
+    .trigger {
+        @apply inline-flex h-9 w-9 items-center justify-center rounded-full bg-white;
+        @apply text-magnum-900 transition-colors hover:bg-white/90;
+        @apply focus-visible:ring focus-visible:ring-magnum-400 focus-visible:ring-offset-2;
+        @apply p-0 text-sm font-medium;
+    }
+
     .akira {
         font-family: "Akira";
     }

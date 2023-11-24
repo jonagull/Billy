@@ -1,20 +1,15 @@
 <script lang="ts">
-    import { page } from "$app/stores";
     import { goto } from "$app/navigation";
-    import { encodeSearchParams } from "stwui/utils";
-    import { Button, Card, Table } from "stwui";
-    import type { Player } from "$lib/interfaces";
-    import { plus } from "$lib/assets/svg/svgPaths";
-    import { Input } from "stwui";
-    import { baseUrl } from "$lib/constants";
-    import { columns } from "./TheTableColumns";
+    import { page } from "$app/stores";
     import { formatDateTime } from "$lib/helpers/dates";
-    import { invalidateAll } from "$app/navigation";
+    import type { Player } from "$lib/interfaces";
+    import { Card, Table } from "stwui";
+    import { encodeSearchParams } from "stwui/utils";
+    import { columns } from "./TheTableColumns";
 
     let base_url: string;
     let orderBy: string;
     let order: "asc" | "desc";
-    let playerName = "";
 
     export let players: Player[];
 
@@ -29,38 +24,6 @@
         goto(`players/${id}`, { replaceState: true });
     };
 
-    function addPlayer() {
-        const playerData = {
-            name: playerName,
-            rating: 1500,
-            gamesPlayed: 0,
-            dateCreated: new Date().toISOString(),
-        };
-
-        fetch(baseUrl + "/Players", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(playerData),
-        })
-            .then(async (response) => {
-                if (response.ok) {
-                    console.log("Player added successfully");
-                    playerName = ""; // Reset the player name
-                    invalidateAll();
-                } else {
-                    console.error("Failed to add player");
-                }
-            })
-            .catch((error) => {
-                console.error(
-                    "An error occurred while adding the player",
-                    error
-                );
-            });
-    }
-
     function onColumnHeaderClick(column: string) {
         goto(
             `${base_url}` +
@@ -74,24 +37,6 @@
 </script>
 
 <Card bordered={false} class="h-[calc(100vh-14rem)] ">
-    <Card.Header
-        slot="header"
-        class="font-bold text-lg flex justify-between items-center py-3"
-    >
-        Players
-        <div class="flex">
-            <Input
-                style="margin-right: 10px"
-                name="input"
-                placeholder="Name"
-                bind:value={playerName}
-            />
-            <Button slot="extra" type="primary" on:click={addPlayer}>
-                <Button.Leading slot="leading" data={plus} />
-                Add player
-            </Button>
-        </div>
-    </Card.Header>
     <Card.Content
         slot="content"
         class="p-0 sm:p-0"

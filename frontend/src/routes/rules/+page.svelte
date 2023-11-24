@@ -6,14 +6,7 @@
     }
 </script>
 
-<div>
-    <button
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-        on:click={handleToggle}
-    >
-        {toggle ? "Norske regler" : "English Rules"}
-    </button>
-</div>
+<h1>Rules</h1>
 
 {#if toggle}
     <div class="p-4">
