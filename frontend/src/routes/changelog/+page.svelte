@@ -16,6 +16,10 @@
             title: "22. Nov 2023 - Pagination",
             text: "Added pagination to feed page, now you can see more than 10 games at a time",
         },
+        {
+            title: "26. Nov 2023 - Changed gamelogging flow, general style upgrade",
+            text: "Changed flow for logging game, removed confirmation modal, added revert button that can be pressed within a time frame after a game is logged ",
+        },
     ];
 </script>
 
