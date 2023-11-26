@@ -137,7 +137,6 @@
                     winnerId = undefined;
                 }, 10000);
             } else {
-                // Handle error response
                 console.error("Failed to submit game.");
             }
         } catch (error) {
@@ -203,7 +202,7 @@
                     src={fingerPointing}
                     alt="fingerp pointing"
                     width="300"
-                    style="rotate: 45deg; z-index: 1000; position: absolute; left: -190px; top: -70px; "
+                    style="rotate: 45deg; z-index: 1000; position: absolute; left: -190px; top: -70px; z-index: 100"
                 />
             {/if}
             <Button
@@ -363,6 +362,9 @@
     .player-card {
         width: 200px;
         height: 150px;
+        border: 3px solid black;
+        border-radius: 15px;
+        box-shadow: 14px 14px 0 -4px black, 14px 14px 0 0 black;
 
         p {
             font-size: 17px;

@@ -52,6 +52,8 @@
         flex-direction: column;
         align-items: center;
         border-radius: 20px;
+        box-shadow: 14px 14px 0 -4px black, 14px 14px 0 0 black;
+        border: 3px solid black;
     }
 
     .akira {

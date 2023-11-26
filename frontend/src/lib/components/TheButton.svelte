@@ -1,9 +1,15 @@
 <script lang="ts">
     export let href: string;
     export let label: string;
+    export let functionToCall: () => void = () => {};
 </script>
 
-<a {href} class="relative inline-block text-lg group" style="width: 145px;">
+<a
+    {href}
+    on:click={functionToCall}
+    class="relative inline-block text-lg group"
+    style="width: 145px;"
+>
     <span
         class="relative z-10 block px-5 py-3 overflow-hidden font-medium leading-tight text-gray-800 transition-colors duration-300 ease-out border-2 border-gray-900 rounded-lg group-hover:text-white"
     >
