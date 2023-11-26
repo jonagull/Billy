@@ -5,7 +5,7 @@ public class GamePlayed
     public int Id { get; private set; }
     public int PlayerOneElo { get; private set; }
     public int PlayerTwoElo { get; private set;  }
-    public DateTime TimeOfPlay { get; private set;  }
+    public DateTime TimeOfPlay { get;  set;  }
     public Player PlayerOne { get; private set; }
     public Player PlayerTwo { get; private set; }
     public Player Winner { get; private set;  }

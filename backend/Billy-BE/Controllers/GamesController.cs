@@ -15,6 +15,93 @@ namespace Billy_BE.Controllers
         {
             _billyContext = billyContext;
         }
+        
+        [HttpGet("homefeed")]
+        public IActionResult GetHomeFeed()
+        {
+            try
+            {
+                var gamesPlayed = _billyContext.GamesPlayed
+                    .Include(game => game.PlayerOne)
+                    .Include(game => game.PlayerTwo)
+                    .Include(game => game.Winner)
+                    .OrderByDescending(game => game.Id) // Order by Id in descending order
+                    .ToList().Take(6);
+
+                var dto = new List<object>();
+
+                foreach (var game in gamesPlayed)
+                {
+
+                    game.PlayerOne.Rating = game.PlayerOneElo;
+                    game.PlayerTwo.Rating = game.PlayerTwoElo;
+                    
+                    var eloChange = CalculateEloChange(game.PlayerOne, game.PlayerTwo, game.Winner.Id);
+                    
+                    game.TimeOfPlay = game.TimeOfPlay.AddHours(1);
+                    
+                    dto.Add(new
+                    {
+                        game,
+                        eloChange
+                    });
+                }
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpPost("revert/{gameId:int}")]
+        public Object RevertLastGame(int gameId)
+        {
+            var gameToRevert = _billyContext.GamesPlayed
+                .Include(game => game.PlayerOne)
+                .Include(game => game.PlayerTwo)
+                .Include(game => game.Winner)
+                .FirstOrDefault(game => game.Id == gameId);
+            
+            if (gameToRevert == null)
+            {
+                return StatusCode(400, "Game not found");
+            }
+
+            var playerOne = _billyContext.Players.Find(gameToRevert.PlayerOne.Id);
+            var playerTwo = _billyContext.Players.Find(gameToRevert.PlayerTwo.Id);
+            var winner = _billyContext.Players.Find(gameToRevert.Winner.Id);
+
+            if (playerOne == null || playerTwo == null || winner == null)
+            {
+                return StatusCode(400, "Player not found");
+            }
+            
+            // TODO: Add validation on whether the players have played any games after this one
+
+            if (playerOne.Id == winner.Id)
+            {
+                playerOne.Wins--;
+                playerTwo.Losses--;
+            }
+            else
+            {
+                playerOne.Losses--;
+                playerTwo.Wins--;
+            }
+
+            playerOne.GamesPlayed--;
+            playerTwo.GamesPlayed--;
+
+            playerOne.Rating = gameToRevert.PlayerOneElo;
+            playerTwo.Rating = gameToRevert.PlayerTwoElo;
+            
+            _billyContext.GamesPlayed.Remove(gameToRevert);
+            _billyContext.SaveChanges();
+
+            return Ok();
+        }
 
         [HttpGet]
         public IActionResult GetAllGamesPlayed(int page = 1, int pageSize = 10)
@@ -88,13 +175,23 @@ namespace Billy_BE.Controllers
                 var gameFact = GenerateGameFact(playerOne, playerTwo, gameDto.WinnerId);
 
                 UpdatePlayerMetrics(playerOne, playerTwo, gameDto.WinnerId);
-                // Update the players' Elo ratings based on the game outcome
-                UpdateEloRatings(playerOne, playerTwo, gameDto.WinnerId);
+                var eloChange = CalculateEloChange(playerOne, playerTwo, gameDto.WinnerId);
+
+                if (eloChange == null)
+                {
+                    return StatusCode(400, "Couldn't calculate Elo ");
+                }
+
+                playerOne.Rating = eloChange.playerOneNewElo;
+                playerTwo.Rating = eloChange.playerTwoNewElo;
+                
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
 
                 _billyContext.Add(game);
                 await _billyContext.SaveChangesAsync();
+                
+                var gameId = game.Id;
 
                 var playerOneRatingDiff = playerOne.Rating - game.PlayerOneElo;
                 var playerTwoRatingDiff = playerTwo.Rating - game.PlayerTwoElo;
@@ -102,6 +199,7 @@ namespace Billy_BE.Controllers
                 // Create a response object containing the updated player objects and rating differences
                 var response = new
                 {
+                    gameId,
                     PlayerOne = new
                     {
                         NewRating = playerOne.Rating,
@@ -168,32 +266,22 @@ namespace Billy_BE.Controllers
                 playerTwo.CurrentWinStreak
             );
         }
-
-        private void UpdateEloRatings(Player? playerOne, Player? playerTwo, int winnerId)
+        
+        private static EloChange? CalculateEloChange(Player? playerOne, Player? playerTwo, int winnerId)
         {
-            // Calculate Elo rating changes based on the game outcome
             const int K = 32; // Elo rating adjustment constant
 
-            if (playerTwo == null)
-                return;
+            if (playerTwo == null || playerOne == null)
+                return null;
 
-            if (playerOne == null)
-                return;
-            var playerOneExpectedScore =
-                1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
+            var playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
             var playerTwoExpectedScore = 1 - playerOneExpectedScore;
 
-            // Update Elo ratings based on the winner
-            if (winnerId == playerOne.Id)
-            {
-                playerOne.Rating += (int)(K * (1 - playerOneExpectedScore));
-                playerTwo.Rating += (int)(K * (0 - playerTwoExpectedScore));
-            }
-            else if (winnerId == playerTwo.Id)
-            {
-                playerOne.Rating += (int)(K * (0 - playerOneExpectedScore));
-                playerTwo.Rating += (int)(K * (1 - playerTwoExpectedScore));
-            }
+            // Calculate the new Elo ratings based on the winner
+            var playerOneNewElo = playerOne.Rating + (int)(K * (winnerId == playerOne.Id ? 1 - playerOneExpectedScore : 0 - playerOneExpectedScore));
+            var playerTwoNewElo = playerTwo.Rating + (int)(K * (winnerId == playerTwo.Id ? 1 - playerTwoExpectedScore : 0 - playerTwoExpectedScore));
+
+            return new EloChange { playerOneNewElo = playerOneNewElo, playerTwoNewElo = playerTwoNewElo };
         }
 
         private static string GenerateGameFact(Player playerOne, Player playerTwo, int winnerId)
@@ -226,4 +314,10 @@ namespace Billy_BE.Controllers
             return player.CurrentWinStreak >= 3 && winnerId != player.Id;
         }
     }
+}
+
+class EloChange
+{
+    public int playerOneNewElo { get; set; }
+    public int playerTwoNewElo { get; set; }
 }
