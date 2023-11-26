@@ -37,3 +37,13 @@ export interface Opponent {
     gamesAgainst?: number;
     winRatio?: number;
 }
+
+export interface HomeFeed {
+    game: GamePlayed;
+    eloChange: EloChange;
+}
+
+export interface EloChange {
+    playerOneNewElo: number;
+    playerTwoNewElo: number;
+}

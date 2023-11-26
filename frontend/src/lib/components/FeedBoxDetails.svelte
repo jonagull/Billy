@@ -1,18 +1,40 @@
 <script lang="ts">
-    export let data: any;
+    import type { HomeFeed } from "$lib/interfaces";
+    import { onMount } from "svelte";
+
+    export let data: HomeFeed;
+
+    let firstPlayerElo = 0;
+    let firstPlayerNewElo = 0;
+    let secondPlayerElo = 0;
+    let secondtPlayerNewElo = 0;
+
+    onMount(() => {
+        if (data.game.winner.id === data.game.playerOne.id) {
+            firstPlayerElo = data.game.playerOneElo;
+            firstPlayerNewElo = data.eloChange.playerOneNewElo;
+            secondPlayerElo = data.game.playerTwoElo;
+            secondtPlayerNewElo = data.eloChange.playerTwoNewElo;
+        } else {
+            firstPlayerElo = data.game.playerTwoElo;
+            firstPlayerNewElo = data.eloChange.playerTwoNewElo;
+            secondPlayerElo = data.game.playerOneElo;
+            secondtPlayerNewElo = data.eloChange.playerOneNewElo;
+        }
+    });
 </script>
 
 <div class="details-container shadow-lg">
     <div class="player-side">
-        <p>{data.game.playerOneElo} -></p>
-        <p class="new-elo-text">&nbsp{data.eloChange.playerOneNewElo}</p>
+        <p>{firstPlayerElo} -></p>
+        <p class="new-elo-text">&nbsp{firstPlayerNewElo}</p>
     </div>
 
     <p style="font-family: 'Akira'">#{data.game.id}</p>
 
     <div class="player-side">
-        <p>{data.game.playerTwoElo} -></p>
-        <p class="new-elo-text">&nbsp{data.eloChange.playerTwoNewElo}</p>
+        <p>{secondPlayerElo} -></p>
+        <p class="new-elo-text">&nbsp{secondtPlayerNewElo}</p>
     </div>
 </div>
 
