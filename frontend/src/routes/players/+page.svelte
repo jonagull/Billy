@@ -83,7 +83,7 @@
     </div>
 </dialog>
 
-<div class="flex mb-5 items-center">
+<div class="flex mb-5 items-center" style="justify-content: space-between">
     <h1 class="mb-4 mr-5">Players</h1>
     <TheButton href="" label="Add Player" functionToCall={openDialog} />
 </div>
