@@ -1,25 +1,29 @@
 <script lang="ts">
     import { chart, dice, person } from "$lib/assets/svg/svgPaths";
-    import Chart from "$lib/components/Chart.svelte";
     import type { GamePlayed } from "$lib/interfaces";
     import type { PageData } from "./$types";
     import { Tabs } from "stwui";
     import { Input } from "stwui";
     import { goto } from "$app/navigation";
+    import TheLineChart from "$lib/components/TheLineChart.svelte";
+    import ThePieChart from "$lib/components/ThePieChart.svelte";
+    import TheBartChart from "$lib/components/TheBartChart.svelte";
 
     export let data: PageData;
 
     let playerId: any;
-
+    let chartType: any = window.sessionStorage.getItem("chartType") || "pie";
     let currentTab = "#tab3";
+
+    $: chartType, window.sessionStorage.setItem("chartType", chartType);
 
     $: playerMetrics = [
         {
-            label: "Antall kamper",
+            label: "Games played",
             value: data.player.gamesPlayed as unknown as string,
         },
         {
-            label: "Rating",
+            label: "Elo",
             value: data.player.rating as unknown as string,
         },
         {
@@ -124,23 +128,56 @@
 
 {#if currentTab === "#tab1"}
     <div style="margin-top: 10px">
-        {#each playerMetrics as metric}
-            <Input name="input" readonly={true} placeholder={metric.value}>
-                <Input.Label slot="label">{metric.label}</Input.Label>
-            </Input>
-        {/each}
+        <div class="grid-container">
+            {#each playerMetrics as metric}
+                <div class="grid-item">
+                    <Input
+                        name="input"
+                        readonly={true}
+                        placeholder={metric.value}
+                        style="font-size: 20px;"
+                    >
+                        <Input.Label slot="label">{metric.label}</Input.Label>
+                    </Input>
+                </div>
+            {/each}
+        </div>
 
         {#if data.opponents.length > 0}
             <hr style="margin-top: 20px" />
+
             <div
-                style="display: flex; flex-direction: column; margin-top: 20px;"
+                style="display: flex; flex-direction: column; margin-top: 20px; justify-content: center; align-items: center"
             >
-                <h2 style="font-size: 20px">
-                    <strong>Opponents</strong>
+                <h2 style="font-size: 20px;  margin-right:auto;">
+                    <strong style="font-family: akira">Opponents</strong>
+                    <div style="display: flex; flex-direction: column">
+                        <label>
+                            <input
+                                type="radio"
+                                bind:group={chartType}
+                                value="pie"
+                            />
+                            Pie Chart
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                bind:group={chartType}
+                                value="bar"
+                            />
+                            Bar Chart
+                        </label>
+                    </div>
                 </h2>
-                {#each data.opponents as opponent}
-                    <span>{opponent.name}: {opponent.gamesAgainst}</span>
-                {/each}
+
+                {#if chartType === "pie"}
+                    <ThePieChart data={data.opponentPieData} />
+                {/if}
+
+                {#if chartType === "bar"}
+                    <TheBartChart data={data.opponentBarData} />
+                {/if}
             </div>
         {/if}
     </div>
@@ -172,7 +209,7 @@
 {/if}
 
 {#if currentTab === "#tab3"}
-    <Chart data={data.lineData} />
+    <TheLineChart data={data.lineData} />
 {/if}
 
 <style>
@@ -204,5 +241,17 @@
 
     p {
         font-size: 18px;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .grid-item {
+        padding: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
     }
 </style>

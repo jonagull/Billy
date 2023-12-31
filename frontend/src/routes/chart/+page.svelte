@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Chart from "$lib/components/Chart.svelte";
+    import TheLineChart from "$lib/components/TheLineChart.svelte";
     import type { PageData } from "./$types";
     import TheComboBox from "$lib/components/TheComboBox.svelte";
     import { onMount } from "svelte";
@@ -100,7 +100,7 @@
     </div>
 </div>
 
-<Chart data={playerElosCopy || data.playerElosLineData} />
+<TheLineChart data={playerElosCopy || data.playerElosLineData} />
 
 <style>
     .button-image {

@@ -46,8 +46,8 @@
                         ? game.game.playerOne.name
                         : game.game.playerTwo.name
                     : game.winnerName === game.playerOneName
-                    ? game.playerOneName
-                    : game.playerTwoName
+                      ? game.playerOneName
+                      : game.playerTwoName
             }`}
         </p>
         <div style="position: relative;">
@@ -68,8 +68,8 @@
                         ? game.game.playerTwo.name
                         : game.game.playerOne.name
                     : game.winnerName === game.playerOneName
-                    ? game.playerTwoName
-                    : game.playerOneName
+                      ? game.playerTwoName
+                      : game.playerOneName
             }`}
         </p>
     </span>

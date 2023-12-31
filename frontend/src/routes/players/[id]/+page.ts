@@ -44,8 +44,80 @@ export const load = (async ({ params }) => {
         ],
     };
 
+    const colors = [
+        "rgb(205, 130, 158)",
+        "rgb(130, 205, 158)",
+        "rgb(158, 130, 205)",
+        "rgb(205, 158, 130)",
+        "rgb(130, 158, 205)",
+        "rgb(158, 205, 130)",
+        "rgb(205, 180, 130)",
+        "rgb(130, 180, 205)",
+        "rgb(180, 130, 205)",
+        "rgb(205, 205, 130)",
+        "rgb(130, 205, 180)",
+        "rgb(205, 130, 180)",
+        "rgb(180, 205, 130)",
+        "rgb(130, 130, 205)",
+        "rgb(205, 130, 130)",
+    ];
+
+    const opponentPieData = {
+        labels: playerResponse.opponents.map((x) => x.name),
+        datasets: [
+            {
+                data: playerResponse.opponents.map((x) => x.gamesAgainst),
+                backgroundColor: [
+                    "#F7464A",
+                    "#46BFBD",
+                    "#FDB45C",
+                    "#949FB1",
+                    "#4D5360",
+                    "#AC64AD",
+                ],
+                hoverBackgroundColor: [
+                    "#FF5A5E",
+                    "#5AD3D1",
+                    "#FFC870",
+                    "#A8B3C5",
+                    "#616774",
+                    "#DA92DB",
+                ],
+            },
+        ],
+    };
+
+    const opponentBarData = {
+        labels: playerResponse.opponents.map((x) => x.name),
+        datasets: [
+            {
+                label: "% of Votes",
+                data: playerResponse.opponents.map((x) => x.gamesAgainst),
+                backgroundColor: [
+                    "rgba(255, 134,159,0.4)",
+                    "rgba(98,  182, 239,0.4)",
+                    "rgba(255, 218, 128,0.4)",
+                    "rgba(113, 205, 205,0.4)",
+                    "rgba(170, 128, 252,0.4)",
+                    "rgba(255, 177, 101,0.4)",
+                ],
+                borderWidth: 2,
+                borderColor: [
+                    "rgba(255, 134, 159, 1)",
+                    "rgba(98,  182, 239, 1)",
+                    "rgba(255, 218, 128, 1)",
+                    "rgba(113, 205, 205, 1)",
+                    "rgba(170, 128, 252, 1)",
+                    "rgba(255, 177, 101, 1)",
+                ],
+            },
+        ],
+    };
+
     return {
         pageData: playerResponse,
+        opponentPieData: opponentPieData,
+        opponentBarData: opponentBarData,
         gamesPlayed: playerResponse.gamesPlayed.reverse(),
         player: playerResponse.player,
         lineData: playerEloLineData,
