@@ -1,4 +1,4 @@
-import { fetchPageData, fetchPlayers } from "$lib/helpers/api";
+import { fetchPlayers } from "$lib/helpers/api";
 import type { PageLoad } from "./$types";
 
 export const load = (async ({ params, url }) => {

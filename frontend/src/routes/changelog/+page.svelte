@@ -20,6 +20,10 @@
             title: "26. Nov 2023 - Changed gamelogging flow, general style upgrade",
             text: "Changed flow for logging game, removed confirmation modal, added revert button that can be pressed within a time frame after a game is logged ",
         },
+        {
+            title: "31. Desember 2023 - Added opponent chart",
+            text: "Added charts for opponents, now you can see how you perform against other players",
+        },
     ];
 </script>
 

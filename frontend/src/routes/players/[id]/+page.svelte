@@ -1,6 +1,5 @@
 <script lang="ts">
     import { chart, dice, person } from "$lib/assets/svg/svgPaths";
-    import type { GamePlayed } from "$lib/interfaces";
     import type { PageData } from "./$types";
     import { Tabs } from "stwui";
     import { Input } from "stwui";
@@ -8,23 +7,24 @@
     import TheLineChart from "$lib/components/TheLineChart.svelte";
     import ThePieChart from "$lib/components/ThePieChart.svelte";
     import TheBartChart from "$lib/components/TheBartChart.svelte";
+    import ThePlayerFeedBox from "$lib/components/ThePlayerFeedBox.svelte";
 
     export let data: PageData;
 
     let playerId: any;
     let chartType: any = window.sessionStorage.getItem("chartType") || "pie";
-    let currentTab = "#tab3";
+    let currentTab = "#tab1";
 
     $: chartType, window.sessionStorage.setItem("chartType", chartType);
 
     $: playerMetrics = [
         {
-            label: "Games played",
-            value: data.player.gamesPlayed as unknown as string,
-        },
-        {
             label: "Elo",
             value: data.player.rating as unknown as string,
+        },
+        {
+            label: "Games played",
+            value: data.player.gamesPlayed as unknown as string,
         },
         {
             label: "Wins",
@@ -72,25 +72,6 @@
         },
     ];
 
-    const getGameLineLabel = (game: GamePlayed) => {
-        const label =
-            game.winner.name === data.player.name
-                ? `Vant over ${
-                      game.winner.name === game.playerOne.name &&
-                      game.playerOne.name === data.player.name
-                          ? game.playerTwo.name
-                          : game.playerOne.name
-                  }`
-                : `Tapte mot ${
-                      game.winner.name !== game.playerOne.name &&
-                      game.playerOne.name === data.player.name
-                          ? game.playerTwo.name
-                          : game.playerOne.name
-                  }`;
-
-        return label;
-    };
-
     const handlePlayerIdChange = () => {
         window.sessionStorage.setItem("playerId", playerId);
         goto("/players/" + playerId, { replaceState: true });
@@ -135,9 +116,11 @@
                         name="input"
                         readonly={true}
                         placeholder={metric.value}
-                        style="font-size: 20px;"
+                        style="font-size: 20px; "
                     >
-                        <Input.Label slot="label">{metric.label}</Input.Label>
+                        <Input.Label style="font-weight: bold;" slot="label"
+                            >{metric.label}</Input.Label
+                        >
                     </Input>
                 </div>
             {/each}
@@ -184,28 +167,7 @@
 {/if}
 
 {#if currentTab === "#tab2"}
-    <div class="feed" style="margin-top: 10px">
-        {#each data.gamesPlayed as game}
-            <div
-                class={game.winner.name === data.player.name
-                    ? "games game bg-green-200"
-                    : "games game bg-red-200"}
-            >
-                <span
-                    style="display: flex; margin-bottom: 2px; height:20px; align-items: center"
-                >
-                    <p style="font-size: 16px;">
-                        {`#${game.id} - ${getGameLineLabel(game)}`}
-                    </p>
-                </span>
-                <p style="font-size: 14px; color: grey;">
-                    {new Date(game.timeOfPlay).toLocaleString("en-US", {
-                        timeZone: "Europe/Oslo",
-                    })}
-                </p>
-            </div>
-        {/each}
-    </div>
+    <ThePlayerFeedBox {data} />
 {/if}
 
 {#if currentTab === "#tab3"}
@@ -213,28 +175,6 @@
 {/if}
 
 <style>
-    .game {
-        border: 1px solid black;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .feed {
-        margin: 0 300px;
-        padding: 50px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        border: 1px solid grey;
-        border-radius: 20px;
-    }
-
-    .games {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
     * {
         color: black;
     }

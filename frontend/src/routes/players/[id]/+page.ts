@@ -91,7 +91,7 @@ export const load = (async ({ params }) => {
         labels: playerResponse.opponents.map((x) => x.name),
         datasets: [
             {
-                label: "% of Votes",
+                label: "",
                 data: playerResponse.opponents.map((x) => x.gamesAgainst),
                 backgroundColor: [
                     "rgba(255, 134,159,0.4)",
