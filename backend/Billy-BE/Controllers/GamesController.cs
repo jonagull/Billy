@@ -15,7 +15,7 @@ namespace Billy_BE.Controllers
         {
             _billyContext = billyContext;
         }
-        
+
         [HttpGet("homefeed")]
         public IActionResult GetHomeFeed()
         {
@@ -35,11 +35,11 @@ namespace Billy_BE.Controllers
 
                     game.PlayerOne.Rating = game.PlayerOneElo;
                     game.PlayerTwo.Rating = game.PlayerTwoElo;
-                    
+
                     var eloChange = CalculateEloChange(game.PlayerOne, game.PlayerTwo, game.Winner.Id);
-                    
+
                     game.TimeOfPlay = game.TimeOfPlay.AddHours(1);
-                    
+
                     dto.Add(new
                     {
                         game,
@@ -63,7 +63,7 @@ namespace Billy_BE.Controllers
                 .Include(game => game.PlayerTwo)
                 .Include(game => game.Winner)
                 .FirstOrDefault(game => game.Id == gameId);
-            
+
             if (gameToRevert == null)
             {
                 return StatusCode(400, "Game not found");
@@ -77,7 +77,7 @@ namespace Billy_BE.Controllers
             {
                 return StatusCode(400, "Player not found");
             }
-            
+
             // TODO: Add validation on whether the players have played any games after this one
 
             if (playerOne.Id == winner.Id)
@@ -96,7 +96,7 @@ namespace Billy_BE.Controllers
 
             playerOne.Rating = gameToRevert.PlayerOneElo;
             playerTwo.Rating = gameToRevert.PlayerTwoElo;
-            
+
             _billyContext.GamesPlayed.Remove(gameToRevert);
             _billyContext.SaveChanges();
 
@@ -184,13 +184,11 @@ namespace Billy_BE.Controllers
 
                 playerOne.Rating = eloChange.playerOneNewElo;
                 playerTwo.Rating = eloChange.playerTwoNewElo;
-                
+
+                _billyContext.Add(game);
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
 
-                _billyContext.Add(game);
-                await _billyContext.SaveChangesAsync();
-                
                 var gameId = game.Id;
 
                 var playerOneRatingDiff = playerOne.Rating - game.PlayerOneElo;
@@ -266,7 +264,7 @@ namespace Billy_BE.Controllers
                 playerTwo.CurrentWinStreak
             );
         }
-        
+
         private static EloChange? CalculateEloChange(Player? playerOne, Player? playerTwo, int winnerId)
         {
             const int K = 32; // Elo rating adjustment constant
