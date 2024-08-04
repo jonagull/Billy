@@ -30,9 +30,52 @@
 
   <ItemGroup>
     <None Remove="Models\" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\apphost" />
+    <None Remove="WebApplication1\obj\WebApplication1.csproj.nuget.g.targets" />
+    <None Remove="WebApplication1\obj\WebApplication1.csproj.nuget.g.props" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.pdb" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.genruntimeconfig.cache" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.dll" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.csproj.FileListAbsolute.txt" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.csproj.CoreCompileInputs.cache" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.csproj.CopyComplete" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.csproj.AssemblyReference.cache" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.assets.cache" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.MvcApplicationPartsAssemblyInfo.cache" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.GeneratedMSBuildEditorConfig.editorconfig" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.AssemblyInfoInputs.cache" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\WebApplication1.pdb" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\WebApplication1.dll" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\WebApplication1" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\staticwebassets\msbuild.buildTransitive.WebApplication1.props" />
+    <None Remove="WebApplication1\obj\Debug\net7.0\staticwebassets\msbuild.buildMultiTargeting.WebApplication1.props" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerUI.dll" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\Swashbuckle.AspNetCore.SwaggerGen.dll" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\Swashbuckle.AspNetCore.Swagger.dll" />
+    <None Remove="WebApplication1\bin\Debug\net7.0\Microsoft.OpenApi.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations" />
-    <Folder Include="Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="WebApplication1\bin\Debug\net7.0\appsettings.json" />
+    <Content Remove="WebApplication1\bin\Debug\net7.0\appsettings.Development.json" />
+    <Content Remove="WebApplication1\appsettings.json" />
+    <Content Remove="WebApplication1\appsettings.Development.json" />
+    <Content Remove="WebApplication1\obj\WebApplication1.csproj.nuget.dgspec.json" />
+    <Content Remove="WebApplication1\bin\Debug\net7.0\WebApplication1.runtimeconfig.json" />
+    <Content Remove="WebApplication1\bin\Debug\net7.0\WebApplication1.deps.json" />
+    <Content Remove="WebApplication1\obj\Debug\net7.0\staticwebassets.build.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.MvcApplicationPartsAssemblyInfo.cs" />
+    <Compile Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.GlobalUsings.g.cs" />
+    <Compile Remove="WebApplication1\obj\Debug\net7.0\WebApplication1.AssemblyInfo.cs" />
+    <Compile Remove="WebApplication1\WeatherForecast.cs" />
+    <Compile Remove="WebApplication1\obj\Debug\net7.0\.NETCoreApp,Version=v7.0.AssemblyAttributes.cs" />
+    <Compile Remove="Migrations\20240514113213_player object to playersnapshot.cs" />
+    <Compile Remove="Migrations\20240514113213_player object to playersnapshot.Designer.cs" />
+    <Compile Remove="Migrations\20240514102627_keklmao123.cs" />
+    <Compile Remove="Migrations\20240514102627_keklmao123.Designer.cs" />
   </ItemGroup>
 </Project>

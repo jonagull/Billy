@@ -28,8 +28,6 @@ await db.Database.MigrateAsync();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
-
 app.UseHttpsRedirection();
 app.UseRouting(); // Add routing middleware
 // Configure CORS
