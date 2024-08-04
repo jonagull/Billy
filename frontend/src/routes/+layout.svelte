@@ -1,11 +1,17 @@
-<script>
+<script lang="ts">
+    import { page } from "$app/stores";
     import "../app.postcss";
     import Header from "./Header.svelte";
     import "./styles.css";
+
+    let isLaunchpad: boolean;
+    $: isLaunchpad = $page.url.pathname.startsWith("/launchpad");
 </script>
 
 <div class="app">
-    <Header />
+    {#if !isLaunchpad}
+        <Header />
+    {/if}
 
     <main>
         <slot />

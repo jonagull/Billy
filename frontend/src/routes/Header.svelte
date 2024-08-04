@@ -26,11 +26,32 @@
                 <a href="/">Home</a>
             </li>
             <li
+                aria-current={$page.url.pathname === "/launchpad"
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/launchpad">Launchpad</a>
+            </li>
+            <li
+                aria-current={$page.url.pathname === "/feedmultiple"
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/feedmultiple">FeedM</a>
+            </li>
+            <li
                 aria-current={$page.url.pathname === "/game"
                     ? "page"
                     : undefined}
             >
                 <a href="/game">Game</a>
+            </li>
+            <li
+                aria-current={$page.url.pathname === "/multiple"
+                    ? "page"
+                    : undefined}
+            >
+                <a href="/multiple">Multiple</a>
             </li>
             <li
                 aria-current={$page.url.pathname === "/players"
@@ -68,20 +89,20 @@
                 <a href="/feed">Feed</a>
             </li>
 
-            <li
+            <!-- <li
                 aria-current={$page.url.pathname === "/rules"
                     ? "page"
                     : undefined}
             >
                 <a href="/rules">Rules</a>
-            </li>
-            <li
+            </li> -->
+            <!-- <li
                 aria-current={$page.url.pathname === "/changelog"
                     ? "page"
                     : undefined}
             >
                 <a href="/changelog">Changelog</a>
-            </li>
+            </li> -->
         </ul>
         <svg viewBox="0 0 2 3" aria-hidden="true">
             <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />

@@ -98,6 +98,8 @@
         const game = {
             playerOneId: selectedPlayerOneId,
             playerTwoId: selectedPlayerTwoId,
+            // playerIds: [selectedPlayerOneId, selectedPlayerTwoId],
+            // playerIds: [1, 2, 7, 8],
             winnerId: winnerId,
         };
 
@@ -364,7 +366,9 @@
         height: 150px;
         border: 3px solid black;
         border-radius: 15px;
-        box-shadow: 14px 14px 0 -4px black, 14px 14px 0 0 black;
+        box-shadow:
+            14px 14px 0 -4px black,
+            14px 14px 0 0 black;
 
         p {
             font-size: 17px;

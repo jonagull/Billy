@@ -47,3 +47,18 @@ export interface EloChange {
     playerOneNewElo: number;
     playerTwoNewElo: number;
 }
+
+export interface GameWithSnapshots {
+    gameId: number;
+    playerSnapShots: PlayerSnapShot[];
+}
+
+export interface PlayerSnapShot {
+    id: number;
+    name: string;
+    playerld: number;
+    eloChange: number;
+    eloPre: number;
+    eloPost: number;
+    place: number;
+}
