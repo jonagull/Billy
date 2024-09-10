@@ -1,9 +1,64 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import github from "$lib/assets/github.svg";
+    import { isMultipleTenant } from "$lib/constants";
     import { onMount } from "svelte";
 
     let playerId: any;
+
+    let routes = [
+        {
+            name: "Home",
+            route: "/",
+        },
+        {
+            name: "Game",
+            route: "/game",
+        },
+        {
+            name: "Players",
+            route: "/players?orderBy=rating&order=desc",
+        },
+        {
+            name: "Profiles",
+            route: `/players/1`,
+        },
+        {
+            name: "Chart",
+            route: "/chart",
+        },
+        {
+            name: "Feed",
+            route: "/feed",
+        },
+    ];
+
+    let routesMultiple = [
+        {
+            name: "Home",
+            route: "/",
+        },
+        {
+            name: "Feed",
+            route: "/feedmultiple",
+        },
+        {
+            name: "Multiple",
+            route: "/multiple",
+        },
+        {
+            name: "Players",
+            route: "/players?orderBy=rating&order=desc",
+        },
+        {
+            name: "Profiles",
+            route: `/players/1`,
+        },
+        {
+            name: "Chart",
+            route: "/chart",
+        },
+    ];
 
     onMount(() => {
         playerId = sessionStorage.getItem("playerId") || "1";
@@ -22,87 +77,15 @@
             <path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
         </svg>
         <ul>
-            <li aria-current={$page.url.pathname === "/" ? "page" : undefined}>
-                <a href="/">Home</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname === "/launchpad"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/launchpad">Launchpad</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname === "/feedmultiple"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/feedmultiple">FeedM</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname === "/game"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/game">Game</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname === "/multiple"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/multiple">Multiple</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname === "/players"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/players?orderBy=rating&order=desc">Players</a>
-            </li>
-            <li
-                aria-current={$page.url.pathname.includes("players/")
-                    ? "page"
-                    : undefined}
-            >
-                <a href={`/players/${playerId}`}>Profiles</a>
-            </li>
-
-            <li
-                aria-current={$page.url.pathname === "/chart"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/chart">Chart</a>
-                <!-- <div
-                    class="absolute inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -top-0 -right-0 dark:border-gray-900"
+            {#each isMultipleTenant ? routesMultiple : routes as route}
+                <li
+                    aria-current={$page.url.pathname === route.route
+                        ? "page"
+                        : undefined}
                 >
-                    !
-                </div> -->
-            </li>
-
-            <li
-                aria-current={$page.url.pathname === "/feed"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/feed">Feed</a>
-            </li>
-
-            <!-- <li
-                aria-current={$page.url.pathname === "/rules"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/rules">Rules</a>
-            </li> -->
-            <!-- <li
-                aria-current={$page.url.pathname === "/changelog"
-                    ? "page"
-                    : undefined}
-            >
-                <a href="/changelog">Changelog</a>
-            </li> -->
+                    <a href={route.route}>{route.name}</a>
+                </li>
+            {/each}
         </ul>
         <svg viewBox="0 0 2 3" aria-hidden="true">
             <path d="M0,0 L0,3 C0.5,3 0.5,3 1,2 L2,0 Z" />

@@ -9,9 +9,9 @@
 </script>
 
 <div class="app">
-    {#if !isLaunchpad}
-        <Header />
-    {/if}
+    <!-- {#if !isLaunchpad} -->
+    <Header />
+    <!-- {/if} -->
 
     <main>
         <slot />
