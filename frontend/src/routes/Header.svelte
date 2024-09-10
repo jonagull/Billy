@@ -47,7 +47,7 @@
             route: "/multiple",
         },
         {
-            name: "Players",
+            name: "Leaderboard",
             route: "/players?orderBy=rating&order=desc",
         },
         {

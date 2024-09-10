@@ -2,7 +2,10 @@ import { baseUrl } from "$lib/constants";
 import type { PageLoad } from "./$types";
 
 export const load = (async () => {
-    // return {
-    // players: players,
-    // };
+    const response = await fetch(`${baseUrl}/players`);
+    const players = await response.json();
+
+    return {
+        players: players,
+    };
 }) satisfies PageLoad;
