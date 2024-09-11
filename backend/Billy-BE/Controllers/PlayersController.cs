@@ -110,6 +110,36 @@ namespace Billy_BE.Controllers
             return players;
         }
 
+        [HttpGet("player/{playerId}/elo-history")]
+        public async Task<IActionResult> GetEloHistoryForPlayer(int playerId)
+        {
+            try
+            {
+                // Fetch all games where the player has participated
+                var games = await _context.GamePlayedMultiplePlayers
+                    .Include(g => g.PlayerSnapshots)
+                    .Where(g => g.PlayerSnapshots.Any(ps => ps.PlayerId == playerId)) // Filter games by player
+                    .ToListAsync();
+
+                // Extract EloPost for the given player from each game
+                var eloHistory = games.Select(game => game.PlayerSnapshots
+                    .FirstOrDefault(ps => ps.PlayerId == playerId)?.EloPost) // Get the EloPost for the player
+                    .Where(elo => elo.HasValue) // Filter out any null values
+                    .Select(elo => elo.Value) // Extract the integer value from nullable
+                    .ToList();
+
+                // Prepend 1500 to the list
+                eloHistory.Insert(0, 1500);
+
+                return Ok(eloHistory);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
 
         // GET: api/Players/5
         [HttpGet("{id}")]

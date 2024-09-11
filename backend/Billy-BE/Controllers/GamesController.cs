@@ -312,6 +312,44 @@ namespace Billy_BE.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        [HttpGet("multiple/{playerId}")]
+        public async Task<IActionResult> GetGamesForPlayerWithAllSnapshots(int playerId)
+        {
+            try
+            {
+                // Fetch games where the given player has snapshots
+                var games = await _billyContext.GamePlayedMultiplePlayers
+                    .Include(g => g.PlayerSnapshots)
+                    .Where(g => g.PlayerSnapshots.Any(ps => ps.PlayerId == playerId)) // Only games where the player participated
+                    .ToListAsync();
+
+                var gamesWithSnapshotsDto = games.Select(game => new GameWithSnapshotsDto
+                {
+                    GameId = game.Id,
+                    TimeOfPlay = game.TimeOfPlay,
+                    // Include all player snapshots for each game
+                    PlayerSnapshots = game.PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                    {
+                        Id = ps.Id,
+                        Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
+                        PlayerId = ps.PlayerId,
+                        EloChange = ps.EloChange,
+                        EloPre = ps.EloPre,
+                        EloPost = ps.EloPost,
+                        Place = ps.Place
+                    }).ToList()
+                }).ToList();
+
+                return Ok(gamesWithSnapshotsDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+
         
         [HttpPost("multiple")]
         public async Task<IActionResult> LogGameMultiplePlayers(GamePlayedMultipleDto gameDto)
