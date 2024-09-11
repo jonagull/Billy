@@ -8,6 +8,8 @@
     import ThePieChart from "$lib/components/ThePieChart.svelte";
     import TheBartChart from "$lib/components/TheBartChart.svelte";
     import ThePlayerFeedBox from "$lib/components/ThePlayerFeedBox.svelte";
+    import { isMultipleTenant } from "$lib/constants";
+    import TheFeedBoxMultiple from "$lib/components/TheFeedBoxMutiple.svelte";
 
     export let data: PageData;
 
@@ -167,7 +169,21 @@
 {/if}
 
 {#if currentTab === "#tab2"}
-    <ThePlayerFeedBox {data} />
+    {#if isMultipleTenant}
+        <div class="feed" style="margin-top: 20px">
+            {#each data.playerGamesWithSnapshots as game}
+                <TheFeedBoxMultiple
+                    isPlayerProfile={true}
+                    playerId={data.pId}
+                    {game}
+                />
+            {/each}
+        </div>
+    {/if}
+
+    {#if !isMultipleTenant}
+        <ThePlayerFeedBox {data} />
+    {/if}
 {/if}
 
 {#if currentTab === "#tab3"}
@@ -175,6 +191,15 @@
 {/if}
 
 <style>
+    .feed {
+        margin: 0 300px;
+        padding: 50px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid grey;
+        border-radius: 20px;
+    }
     * {
         color: black;
     }

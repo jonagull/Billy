@@ -5,6 +5,8 @@
     import FeedBoxDetailsMultiple from "./FeedBoxDetailsMultiple.svelte";
 
     export let game: GameWithSnapshots;
+    export let isPlayerProfile: boolean = false;
+    export let playerId: string | null = null;
 
     const findWinnerName = (game: any) => {
         const snapshots = game.playerSnapshots;
@@ -27,9 +29,25 @@
         closeOnPointerDown: false,
         forceVisible: true,
     });
+
+    const getClassName = () => {
+        if (isPlayerProfile && playerId) {
+            console.log("game", game);
+
+            const place =
+                game.playerSnapshots?.find((x) => x.playerId == +playerId)
+                    ?.place || null;
+
+            if (place !== 1) {
+                return "feed-element red";
+            }
+        }
+
+        return "feed-element";
+    };
 </script>
 
-<div class="feed-element" use:melt={$trigger}>
+<div class={getClassName()} use:melt={$trigger}>
     <p class="id-box akira">#{game.gameId}</p>
     <p>
         {findWinnerName(game)}
@@ -65,6 +83,10 @@
         align-items: center;
         margin-bottom: 20px;
         background: #bbf7d0;
+    }
+
+    .red {
+        background-color: #fecaca;
     }
 
     .feed-element-name {

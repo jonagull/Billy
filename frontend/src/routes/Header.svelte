@@ -9,54 +9,54 @@
     let routes = [
         {
             name: "Home",
-            route: "/",
+            path: "/",
         },
         {
             name: "Game",
-            route: "/game",
+            path: "/game",
         },
         {
             name: "Players",
-            route: "/players?orderBy=rating&order=desc",
+            path: "/players?orderBy=rating&order=desc",
         },
         {
             name: "Profiles",
-            route: `/players/1`,
+            path: `/players/1`,
         },
         {
             name: "Chart",
-            route: "/chart",
+            path: "/chart",
         },
         {
             name: "Feed",
-            route: "/feed",
+            path: "/feed",
         },
     ];
 
     let routesMultiple = [
         {
             name: "Home",
-            route: "/",
+            path: "/",
         },
         {
             name: "Feed",
-            route: "/feedmultiple",
+            path: "/feedmultiple",
         },
         {
-            name: "Multiple",
-            route: "/multiple",
+            name: "Log Game",
+            path: "/multiple",
         },
         {
             name: "Leaderboard",
-            route: "/players?orderBy=rating&order=desc",
+            path: "/players?orderBy=rating&order=desc",
         },
         {
             name: "Profiles",
-            route: `/players/1`,
+            path: `/players/1`,
         },
         {
             name: "Chart",
-            route: "/chart",
+            path: "/chart",
         },
     ];
 
@@ -79,11 +79,11 @@
         <ul>
             {#each isMultipleTenant ? routesMultiple : routes as route}
                 <li
-                    aria-current={$page.url.pathname === route.route
+                    aria-current={$page.url.pathname === route.path
                         ? "page"
                         : undefined}
                 >
-                    <a href={route.route}>{route.name}</a>
+                    <a href={route.path}>{route.name}</a>
                 </li>
             {/each}
         </ul>

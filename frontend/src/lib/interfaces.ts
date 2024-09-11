@@ -50,13 +50,13 @@ export interface EloChange {
 
 export interface GameWithSnapshots {
     gameId: number;
-    playerSnapShots: PlayerSnapShot[];
+    playerSnapshots: PlayerSnapShot[];
 }
 
 export interface PlayerSnapShot {
     id: number;
     name: string;
-    playerld: number;
+    playerId: number;
     eloChange: number;
     eloPre: number;
     eloPost: number;

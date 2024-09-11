@@ -1,3 +1,4 @@
+import { baseUrl, isMultipleTenant } from "$lib/constants";
 import { fetchPageData } from "$lib/helpers/api";
 import type { Player, PlayerProfile } from "$lib/interfaces";
 import type { PageLoad } from "./$types";
@@ -7,11 +8,30 @@ export const load = (async ({ params }) => {
         "Players/" + params.id
     );
 
+    let playerGameElos: number[] = [];
+    let playerGamesWithSnapshots = [];
+
     const playersResponse: Player[] = await fetchPageData("Players");
 
-    const playerGameElos = playerResponse.gamesPlayed.map((x) =>
-        x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
-    );
+    if (!isMultipleTenant) {
+        playerGameElos = playerResponse.gamesPlayed.map((x) =>
+            x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
+        );
+    }
+
+    if (isMultipleTenant) {
+        const playerElos = await fetch(
+            `${baseUrl}/Players/player/${params.id}/elo-history`
+        );
+        playerGameElos = await playerElos.json();
+
+        const playerGamesPlayedWithSnapshotsResponse = await fetch(
+            `${baseUrl}/Games/multiple/${params.id}`
+        );
+
+        playerGamesWithSnapshots =
+            await playerGamesPlayedWithSnapshotsResponse.json();
+    }
 
     playerGameElos.push(playerResponse.player.rating);
 
@@ -116,6 +136,8 @@ export const load = (async ({ params }) => {
 
     return {
         pageData: playerResponse,
+        pId: params.id,
+        playerGamesWithSnapshots: playerGamesWithSnapshots,
         opponentPieData: opponentPieData,
         opponentBarData: opponentBarData,
         gamesPlayed: playerResponse.gamesPlayed.reverse(),
