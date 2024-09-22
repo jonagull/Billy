@@ -8,7 +8,7 @@
     console.log("data", data);
 </script>
 
-<h1>Feedm</h1>
+<h1>Feed</h1>
 
 <section>
     <div class="shadow-2xl feed">

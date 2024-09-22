@@ -3,17 +3,20 @@
     import { createTooltip, melt } from "@melt-ui/svelte";
     import { fade } from "svelte/transition";
     import FeedBoxDetailsMultiple from "./FeedBoxDetailsMultiple.svelte";
+    import { onMount } from "svelte";
+    import { formatFeedDate } from "$lib/helpers/dates";
 
     export let game: GameWithSnapshots;
     export let isPlayerProfile: boolean = false;
     export let playerId: string | null = null;
 
     const findWinnerName = (game: any) => {
-        const snapshots = game.playerSnapshots;
-        const winner = snapshots.find(
+        const winner = game.playerSnapshots.find(
             (snapshot: PlayerSnapShot) => snapshot.place == 1
         );
-
+        if (!winner) {
+            return "No winner";
+        }
         return winner.name;
     };
 
@@ -32,8 +35,6 @@
 
     const getClassName = () => {
         if (isPlayerProfile && playerId) {
-            console.log("game", game);
-
             const place =
                 game.playerSnapshots?.find((x) => x.playerId == +playerId)
                     ?.place || null;
@@ -48,10 +49,15 @@
 </script>
 
 <div class={getClassName()} use:melt={$trigger}>
-    <p class="id-box akira">#{game.gameId}</p>
-    <p>
-        {findWinnerName(game)}
-    </p>
+    <span style="display: flex">
+        <p class="akira">#{game.gameId}&nbsp</p>
+        <p>
+            {findWinnerName(game)}&nbsp
+        </p>
+        <!-- <p class="feed-time" style="margin-left: 10px">
+            {formatFeedDate(game.timeOfPlay)}
+        </p> -->
+    </span>
 </div>
 
 {#if $open}
@@ -98,5 +104,17 @@
 
     .akira {
         font-family: "Akira";
+    }
+
+    .feed-time {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: white;
+        padding: 3px;
+        width: 131px;
+        border-radius: 5px;
+        background-color: black;
     }
 </style>

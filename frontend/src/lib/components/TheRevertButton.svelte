@@ -29,6 +29,13 @@
                     }, 10000);
                 } else {
                     console.error("Failed to revert game");
+                    setTimeout(() => {
+                        showResponse = true;
+                    }, 2000);
+
+                    setTimeout(() => {
+                        isReverting = false;
+                    }, 10000);
                 }
             })
             .catch((error) => {

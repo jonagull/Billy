@@ -17,6 +17,8 @@ export const load = (async ({ params }) => {
         playerGameElos = playerResponse.gamesPlayed.map((x) =>
             x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
         );
+
+        playerGameElos.push(playerResponse.player.rating);
     }
 
     if (isMultipleTenant) {
@@ -32,8 +34,6 @@ export const load = (async ({ params }) => {
         playerGamesWithSnapshots =
             await playerGamesPlayedWithSnapshotsResponse.json();
     }
-
-    playerGameElos.push(playerResponse.player.rating);
 
     const playerGameLabels = playerGameElos.map((_, index) => index);
 
@@ -137,7 +137,7 @@ export const load = (async ({ params }) => {
     return {
         pageData: playerResponse,
         pId: params.id,
-        playerGamesWithSnapshots: playerGamesWithSnapshots,
+        playerGamesWithSnapshots: playerGamesWithSnapshots.reverse(),
         opponentPieData: opponentPieData,
         opponentBarData: opponentBarData,
         gamesPlayed: playerResponse.gamesPlayed.reverse(),

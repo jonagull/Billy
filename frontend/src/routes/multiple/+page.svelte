@@ -1,30 +1,21 @@
 <script lang="ts">
     import billyLogo from "$lib/assets//milkybilly.png";
-    import fingerPointing from "$lib/assets/fingerpoint.png";
-    import type { PageData } from "./$types";
-    import type { Player } from "$lib/interfaces";
+    import TheComboBox from "$lib/components/TheComboBox.svelte";
+    import TheGameSnapshotsModal from "$lib/components/TheGameSnapshotsModal.svelte";
+    import TheProgressBar from "$lib/components/TheProgressBar.svelte";
+    import TheRevertButton from "$lib/components/TheRevertButton.svelte";
+    import { baseUrl } from "$lib/constants";
     import { Alert, Button } from "stwui";
     import { onMount } from "svelte";
     import { fade, fly } from "svelte/transition";
-    import TheComboBox from "$lib/components/TheComboBox.svelte";
-    import { baseUrl } from "$lib/constants";
-    import TheProgressBar from "$lib/components/TheProgressBar.svelte";
-    import TheRevertButton from "$lib/components/TheRevertButton.svelte";
+    import type { PageData } from "./$types";
 
     export let data: PageData;
 
-    let winnerId: number | undefined;
-    let selectedPlayerOneId: number | undefined;
-    let selectedPlayerOne: Player | undefined;
-    let selectedPlayerTwoId: number | undefined;
-    let selectedPlayerTwo: Player | undefined;
-    let availablePlayers: any[] = [];
-    let playerOneRatingChange: number;
+    let modalRef: any;
     let playerTwoRatingChange: number;
     let showAlert = false;
     let gameFact: string;
-    let gameResult: string | undefined;
-    let showHand: boolean = true;
     let showRevert: boolean = false;
     let gameId: number;
     let isReverting: boolean = false;
@@ -34,9 +25,11 @@
     let playersCopy: any[] = [];
     let selectedPlayers: any[] = [];
     let playersRanking: any[] = [];
+    let playerSnapshots: any[] = [];
+    let showModal: boolean = false;
+    let dialog: HTMLDialogElement;
 
     onMount(() => {
-        availablePlayers = data.mappedPlayers;
         playersCopy = data.mappedPlayers;
     });
 
@@ -73,30 +66,6 @@
         playersCopy = playersCopy;
     };
 
-    // $: {
-    //     if (selectedPlayerOneId) {
-    //         selectedPlayerOne = data.players.find(
-    //             (player: { id: number | undefined }) =>
-    //                 player.id === selectedPlayerOneId
-    //         );
-
-    //         updateAvailablePlayers();
-    //     }
-
-    //     if (selectedPlayerTwoId) {
-    //         selectedPlayerTwo = data.players.find(
-    //             (player: { id: number | undefined }) =>
-    //                 player.id === selectedPlayerTwoId
-    //         );
-    //     }
-    // }
-
-    const updateAvailablePlayers = () => {
-        availablePlayers = data.mappedPlayers.filter(
-            (player: any) => player.id !== selectedPlayerOneId
-        );
-    };
-
     async function logGame() {
         if (playersRanking.length == 1) {
             logError = "You need at least two players to log a game!";
@@ -122,10 +91,23 @@
                 gameFact = "Looking good!";
                 showAlert = true;
                 showError = false;
+                showRevert = true;
+                showModal = true;
+
+                const data = await response.json();
+                playerSnapshots = data.playerSnapshots;
+
+                // setTimeout(() => {
+                //     dialog.showModal();
+                // }, 3000);
 
                 setTimeout(() => {
                     showAlert = false;
                 }, 7000);
+
+                setTimeout(() => {
+                    showRevert = false;
+                }, 10000);
             } else {
                 console.error("Failed to submit game.");
             }
@@ -235,14 +217,6 @@
         </div>
     </form>
 
-    <!-- <div class="flex buttons-wrapper">
-        {#each selectedPlayers as sp}
-            <button class="sp-button" on:click={() => removePlayer(sp.id)}>
-                {sp.name}
-            </button>
-        {/each}
-    </div> -->
-
     <!-- Submit button -->
     <div class="text-center" style="margin-top: 20px">
         <!-- svelte-ignore a11y-missing-attribute -->
@@ -302,23 +276,35 @@
                         <p>
                             Elo: {sp.rating || "N/A"}
                         </p>
-                        <!-- {#if playerTwoRatingChange}
+                        {#if playerSnapshots.length > 0}
                             <p
-                                class={playerTwoRatingChange > 0
+                                class={playerSnapshots.find(
+                                    (p) => p.playerId === sp.id
+                                ).eloPost > sp.rating
                                     ? "green-text"
                                     : "red-text"}
                             >
-                                {playerTwoRatingChange > 0
-                                    ? `+${playerTwoRatingChange}`
-                                    : `${playerTwoRatingChange}`}
+                                {playerSnapshots.find(
+                                    (p) => p.playerId === sp.id
+                                ).eloChange >= 0
+                                    ? `+${
+                                          playerSnapshots.find(
+                                              (p) => p.playerId === sp.id
+                                          ).eloChange
+                                      }`
+                                    : `${
+                                          playerSnapshots.find(
+                                              (p) => p.playerId === sp.id
+                                          ).eloChange
+                                      }`}
                             </p>
-                        {/if} -->
+                        {/if}
                     </span>
                     <span class="flex">
                         <p class="flex">
                             Games: {sp.gamesPlayed || "N/A"}
                         </p>
-                        {#if playerTwoRatingChange}
+                        {#if playerSnapshots.length > 0}
                             <p class="green-text">+1</p>
                         {/if}
                     </span>
@@ -337,7 +323,26 @@
             <TheRevertButton bind:isReverting {gameId} />
         </div>
     {/if}
+
+    <!-- {#if showModal}
+        <TheGameSnapshotsModal
+            bind:this={modalRef}
+            snapshots={playerSnapshots}
+        />
+    {/if} -->
 </div>
+
+<!-- {#if playerSnapshots.length > 0} -->
+<!-- <dialog
+    class="dialog relative w-full max-w-md max-h-full rounded"
+    bind:this={dialog}
+>
+    {#each playerSnapshots as p}
+        <p in:fade>{p.name}</p>
+    {/each}
+</dialog> -->
+
+<!-- {/if} -->
 
 <style lang="scss">
     .progress-bar {
@@ -413,5 +418,10 @@
         padding: 5px;
         border-radius: 5px;
         font-family: "Akira";
+    }
+
+    dialog::backdrop {
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
     }
 </style>

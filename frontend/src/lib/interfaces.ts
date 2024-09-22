@@ -50,6 +50,7 @@ export interface EloChange {
 
 export interface GameWithSnapshots {
     gameId: number;
+    timeOfPlay: Date;
     playerSnapshots: PlayerSnapShot[];
 }
 
@@ -62,3 +63,13 @@ export interface PlayerSnapShot {
     eloPost: number;
     place: number;
 }
+
+export type PlayerSnapshot = {
+    id: number;
+    name: string;
+    playerId: number;
+    eloChange: number;
+    eloPre: number;
+    eloPost: number;
+    place: number;
+};
