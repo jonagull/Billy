@@ -54,7 +54,7 @@ namespace Billy_BE.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        
+
         // [HttpGet("multiple")]
         // public async Task<IActionResult> GetFeedMultiplePlayers()
         // {
@@ -187,12 +187,12 @@ namespace Billy_BE.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-        
-        
+
+
         private List<ELOPlayer> CalculateEloManyPlayers(List<Player> pla)
         {
             var players = new List<ELOPlayer>();
-            
+
             foreach (var player in pla)
             {
                 var p = new ELOPlayer()
@@ -203,25 +203,25 @@ namespace Billy_BE.Controllers
                     eloChange = 0,
                     eloPost = 0
                 };
-                
+
                 players.Add(p);
             }
-            
+
             int n = players.Count();
-            float K = 32 / (float)(n - 1);
-        
+            float K = 300 / (float)(n - 1);
+
             for (int i = 0; i < n; i++)
             {
                 int curPlace = players[i].place;
-                int curELO   = players[i].eloPre;
-        
+                int curELO = players[i].eloPre;
+
                 for (int j = 0; j < n; j++)
                 {
                     if (i != j)
                     {
                         int opponentPlace = players[j].place;
-                        int opponentELO   = players[j].eloPre;
-        
+                        int opponentELO = players[j].eloPre;
+
                         //work out S
                         float S;
                         if (curPlace < opponentPlace)
@@ -230,10 +230,10 @@ namespace Billy_BE.Controllers
                             S = 0.5F;
                         else
                             S = 0.0F;
-        
+
                         //work out EA
                         float EA = 1 / (1.0f + (float)Math.Pow(10.0f, (opponentELO - curELO) / 400.0f));
-        
+
                         //calculate ELO change vs this one opponent, add it to our change bucket
                         //I currently round at this point, this keeps rounding changes symetrical between EA and EB, but changes K more than it should
                         players[i].eloChange += (int)Math.Round(K * (S - EA));
@@ -244,7 +244,7 @@ namespace Billy_BE.Controllers
             }
             return players;
         }
-        
+
         private async void UpdateMetrics(List<ELOPlayer> players)
         {
             foreach (var player in players)
@@ -253,33 +253,34 @@ namespace Billy_BE.Controllers
 
                 foundPlayer.GamesPlayed++;
                 foundPlayer.Rating = player.eloPost;
-                
+
                 if (player.place == 1)
                 {
                     foundPlayer.Wins++;
                     foundPlayer.CurrentWinStreak++;
                 }
-                
+
                 if (player.place != 1)
                 {
                     foundPlayer.Losses++;
+                    foundPlayer.CurrentWinStreak = 0;
                 }
-                
+
                 foundPlayer.LongestWinStreak = Math.Max(
                     foundPlayer.LongestWinStreak,
                     foundPlayer.CurrentWinStreak
                 );
-                
+
                 foundPlayer.Winrate = (int)(
                     foundPlayer.Losses > 0 || foundPlayer.Wins > 0
                         ? (foundPlayer.Wins * 100.0 / foundPlayer.GamesPlayed)
                         : 0
                 );
-                
+
                 await _billyContext.SaveChangesAsync();
             }
         }
-        
+
         [HttpGet("multiple")]
         public async Task<IActionResult> GetAllGamesWithSnapshots()
         {
@@ -350,28 +351,30 @@ namespace Billy_BE.Controllers
         }
 
 
-        
+
         [HttpPost("multiple")]
         public async Task<IActionResult> LogGameMultiplePlayers(GamePlayedMultipleDto gameDto)
         {
             try
             {
                 var players = new List<Player>();
-                
+
                 foreach (int gameDtoPlayerId in gameDto.PlayerIds)
                 {
                     var playerFound = await _billyContext.Players.FindAsync(gameDtoPlayerId);
-        
+
                     if (playerFound != null)
                     {
                         players.Add(playerFound);
                     }
                 }
-                
+
                 var calculatedPlayers = CalculateEloManyPlayers(players);
+                // var calculatedPlayers = Glicko2System.C(players);
+
                 UpdateMetrics(calculatedPlayers);
                 var playerSnapshots = new List<PlayerSnapshot>();
-                
+
                 foreach (var calculatedPlayer in calculatedPlayers)
                 {
                     var snapshot = new PlayerSnapshot()
@@ -382,24 +385,31 @@ namespace Billy_BE.Controllers
                         EloPost = calculatedPlayer.eloPost,
                         Place = calculatedPlayer.place
                     };
-                        playerSnapshots.Add(snapshot);
-                        _billyContext.PlayerSnapshots.Add(snapshot);
-                        await _billyContext.SaveChangesAsync();
+                    playerSnapshots.Add(snapshot);
+                    _billyContext.PlayerSnapshots.Add(snapshot);
+                    await _billyContext.SaveChangesAsync();
                 }
-                
+
                 var game = new GamePlayedMultiplePlayers(playerSnapshots);
-                
+
                 _billyContext.GamePlayedMultiplePlayers.Add(game);
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
-                
+
                 var response = new
                 {
                     game.Id,
-                    calculatedPlayers
-                    // GameFact = gameFact
+                    playerSnapshots = playerSnapshots.Select(snapshot => new
+                    {
+                        snapshot.PlayerId,
+                        _billyContext.Players.Find(snapshot.PlayerId)?.Name,
+                        snapshot.EloChange,
+                        snapshot.EloPre,
+                        snapshot.EloPost,
+                        snapshot.Place
+                    })
                 };
-        
+
                 return Ok(response);
             }
             catch (Exception ex)
@@ -416,41 +426,41 @@ namespace Billy_BE.Controllers
                 // Find the players involved in the game by their IDs
                 var playerOne = await _billyContext.Players.FindAsync(gameDto.PlayerOneId);
                 var playerTwo = await _billyContext.Players.FindAsync(gameDto.PlayerTwoId);
-                
+
                 if (playerOne == null || playerTwo == null)
                 {
                     return NotFound("One or both players not found");
                 }
-                
+
                 var game = new GamePlayed(
                     playerOne,
                     playerTwo,
                     gameDto.WinnerId == gameDto.PlayerOneId ? playerOne : playerTwo
                 );
-                
+
                 // Generate a game fact based on the game outcome
                 var gameFact = GenerateGameFact(playerOne, playerTwo, gameDto.WinnerId);
 
                 UpdatePlayerMetrics(playerOne, playerTwo, gameDto.WinnerId);
                 var eloChange = CalculateEloChange(playerOne, playerTwo, gameDto.WinnerId);
-                
+
                 if (eloChange == null)
                 {
                     return StatusCode(400, "Couldn't calculate Elo ");
                 }
-                
+
                 playerOne.Rating = eloChange.playerOneNewElo;
                 playerTwo.Rating = eloChange.playerTwoNewElo;
-                
+
                 _billyContext.Add(game);
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
-                
+
                 var gameId = game.Id;
-                
+
                 var playerOneRatingDiff = playerOne.Rating - game.PlayerOneElo;
                 var playerTwoRatingDiff = playerTwo.Rating - game.PlayerTwoElo;
-                
+
                 // Create a response object containing the updated player objects and rating differences
                 var response = new
                 {
@@ -465,10 +475,10 @@ namespace Billy_BE.Controllers
                         NewRating = playerTwo.Rating,
                         RatingDiff = playerTwoRatingDiff,
                     },
-                
+
                     GameFact = gameFact
                 };
-                
+
                 // Return the response as JSON
                 return Ok(response);
             }
@@ -580,8 +590,8 @@ class EloChange
 
 public class ELOPlayer : Player
 {
-    public int place     = 0;
-    public int eloPre    = 0;
-    public int eloPost   = 0;
+    public int place = 0;
+    public int eloPre = 0;
+    public int eloPost = 0;
     public int eloChange = 0;
 }

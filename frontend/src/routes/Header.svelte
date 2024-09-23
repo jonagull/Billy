@@ -52,7 +52,7 @@
         },
         {
             name: "Profiles",
-            path: `/players/1`,
+            path: `/players/7`,
         },
         {
             name: "Chart",

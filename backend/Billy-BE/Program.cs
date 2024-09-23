@@ -22,7 +22,7 @@ var app = builder.Build();
 // Migrate database
 await using var scope = app.Services.CreateAsyncScope();
 await using var db = scope.ServiceProvider.GetRequiredService<BillyContext>();
-await db.Database.MigrateAsync();
+// await db.Database.MigratedisAsync();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();

@@ -23,9 +23,9 @@
 </div>
 
 <style lang="scss">
-    img {
-        margin: 20px 0;
-    }
+    // img {
+    //     margin: 20px 0;
+    // }
 
     .billy-container {
         font-family: "Akira";
@@ -45,13 +45,13 @@
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        height: 100vh;
+        height: 90vh;
         margin-bottom: 50px;
     }
 
     .launchpad {
         display: grid;
-        grid-template-columns: repeat(2, 300px);
+        grid-template-columns: repeat(2, 200px);
         gap: 32px;
     }
 
@@ -59,8 +59,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 300px;
-        height: 300px;
+        width: 200px;
+        height: 200px;
         background-color: white;
         color: black;
         font-size: 16px;
