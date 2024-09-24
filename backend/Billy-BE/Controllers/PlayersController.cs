@@ -61,6 +61,51 @@ namespace Billy_BE.Controllers
             return Ok(dto);
         }
 
+        [HttpGet("ElosMultiple")]
+public async Task<ActionResult<IEnumerable<PlayerEloProgressionDto>>> GetPlayersEloProgressionsMultiple()
+{
+    var players = await _context.Players.ToListAsync();
+    var snapshots = await _context.PlayerSnapshots
+        .Include(ps => ps.GamePlayedMultiplePlayers) // Ensure you include the related game data
+        .ToListAsync();
+
+    List<PlayerEloProgressionDto> dto = new List<PlayerEloProgressionDto>();
+
+    foreach (var player in players)
+    {
+        var playerEloProgression = new PlayerEloProgressionDto
+        {
+            Player = player,
+            Elos = new List<int> { 1500 } // Start with default Elo
+        };
+
+        // Get all the Elo snapshots for this player, ordered by time
+        var playerSnapshots = snapshots
+            .Where(ps => ps.PlayerId == player.Id)
+            .OrderBy(ps => ps.SnapshotTime)
+            .ToList();
+
+        // Add Elo progression from snapshots
+        foreach (var snapshot in playerSnapshots)
+        {
+            playerEloProgression.Elos.Add(snapshot.EloPost); // Add the Elo after each game
+        }
+
+        // Add the current Elo at the end of progression
+        playerEloProgression.Elos.Add(player.Rating);
+
+        dto.Add(playerEloProgression);
+    }
+
+    if (dto.IsNullOrEmpty())
+    {
+        return BadRequest("No eloprogressions found");
+    }
+
+    return Ok(dto);
+}
+
+
 
     // GET: api/Players
         [HttpGet]
