@@ -231,12 +231,88 @@ public async Task<ActionResult<IEnumerable<PlayerEloProgressionDto>>> GetPlayers
             var dto = new PlayerProfileDto
             {
                 Player = player,
-                GamesPlayed = gamesPlayed,
                 Opponents = opponents
             };
 
             return Ok(dto);
         }
+
+        // GET: api/Players/5
+[HttpGet("{id}/multiple")]
+public async Task<ActionResult<PlayerProfileDto>> GetPlayerWithSnapshots(int id)
+{
+    var player = await _context.Players.FindAsync(id);
+    
+    if (player == null)
+    {
+        return NotFound();
+    }
+
+    var opponents = new List<Opponent>();
+    var temp = new List<int>(); // Store opponent player IDs
+
+    // Get all snapshots where the player participated
+    var playerSnapshots = await _context.PlayerSnapshots
+        .Include(ps => ps.GamePlayedMultiplePlayers)
+        .Where(ps => ps.PlayerId == id)
+        .ToListAsync();
+
+    // Extract all games the player has participated in
+    var gamesPlayed = playerSnapshots
+        .Select(ps => ps.GamePlayedMultiplePlayers)
+        .Distinct()
+        .ToList();
+
+    // Loop through games
+    foreach (var game in gamesPlayed)
+    {
+        // Get all snapshots for this game
+        var gameSnapshots = await _context.PlayerSnapshots
+            .Where(ps => ps.GamePlayedMultiplePlayersId == game.Id)
+            .ToListAsync();
+
+        // For each snapshot, find the players who are not the current player
+        foreach (var snapshot in gameSnapshots)
+        {
+            if (snapshot.PlayerId != id)
+            {
+                temp.Add(snapshot.PlayerId); // Add opponent player ID
+            }
+        }
+    }
+
+    // Group by opponent player ID and count the number of games played
+    var grouped = temp.GroupBy(t => t);
+
+    foreach (var gr in grouped)
+    {
+        var opponentId = gr.Key;
+        var groupCount = gr.Count();
+
+        // Get opponent player information
+        var opponentPlayer = await _context.Players.FindAsync(opponentId);
+        if (opponentPlayer != null)
+        {
+            var opponent = new Opponent
+            {
+                Name = opponentPlayer.Name,
+                GamesAgainst = groupCount
+            };
+
+            opponents.Add(opponent);
+        }
+    }
+
+    // Create the DTO
+    var dto = new PlayerProfileDto
+    {
+        Player = player,
+        Opponents = opponents
+    };
+
+    return Ok(dto);
+}
+
 
         // PUT: api/Players/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

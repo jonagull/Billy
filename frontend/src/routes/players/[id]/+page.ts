@@ -4,21 +4,34 @@ import type { Player, PlayerProfile } from "$lib/interfaces";
 import type { PageLoad } from "./$types";
 
 export const load = (async ({ params }) => {
-    const playerResponse: PlayerProfile = await fetchPageData(
-        "Players/" + params.id
-    );
+    let playerResponse: PlayerProfile | null = null;
+    
+    if (isMultipleTenant) {
+        playerResponse  = await fetchPageData(
+            "Players/" + params.id + "/multiple"
+        );
+    } else {
+        playerResponse  = await fetchPageData(
+            "Players/" + params.id
+        );
+    }
 
-    let playerGameElos: number[] = [];
+
+    let playerGameElos: number[] | null = [];
     let playerGamesWithSnapshots = [];
 
     const playersResponse: Player[] = await fetchPageData("Players");
 
     if (!isMultipleTenant) {
-        playerGameElos = playerResponse.gamesPlayed.map((x) =>
-            x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
-        );
+        if (playerResponse && playerResponse.gamesPlayed.length === 0) {
+            return;
+        }
 
-        playerGameElos.push(playerResponse.player.rating);
+        playerGameElos = playerResponse?.gamesPlayed.map((x) =>
+            x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
+        ) ?? [];
+
+        playerGameElos.push(playerResponse?.player.rating ?? 0);
     }
 
     if (isMultipleTenant) {
@@ -35,13 +48,13 @@ export const load = (async ({ params }) => {
             await playerGamesPlayedWithSnapshotsResponse.json();
     }
 
-    const playerGameLabels = playerGameElos.map((_, index) => index);
+    const playerGameLabels = playerGameElos?.map((_, index) => index);
 
     const playerEloLineData = {
         labels: playerGameLabels,
         datasets: [
             {
-                label: playerResponse.player.name + " elo history",
+                label: playerResponse?.player.name + " elo history",
                 fill: true,
                 lineTension: 0.3,
                 backgroundColor: "rgba(225, 204,230, .3)",
@@ -83,10 +96,10 @@ export const load = (async ({ params }) => {
     ];
 
     const opponentPieData = {
-        labels: playerResponse.opponents.map((x) => x.name),
+        labels: playerResponse?.opponents.map((x) => x.name),
         datasets: [
             {
-                data: playerResponse.opponents.map((x) => x.gamesAgainst),
+                data: playerResponse?.opponents.map((x) => x.gamesAgainst),
                 backgroundColor: [
                     "#F7464A",
                     "#46BFBD",
@@ -108,11 +121,11 @@ export const load = (async ({ params }) => {
     };
 
     const opponentBarData = {
-        labels: playerResponse.opponents.map((x) => x.name),
+        labels: playerResponse?.opponents.map((x) => x.name),
         datasets: [
             {
                 label: "",
-                data: playerResponse.opponents.map((x) => x.gamesAgainst),
+                data: playerResponse?.opponents.map((x) => x.gamesAgainst),
                 backgroundColor: [
                     "rgba(255, 134,159,0.4)",
                     "rgba(98,  182, 239,0.4)",
@@ -140,10 +153,10 @@ export const load = (async ({ params }) => {
         playerGamesWithSnapshots: playerGamesWithSnapshots.reverse(),
         opponentPieData: opponentPieData,
         opponentBarData: opponentBarData,
-        gamesPlayed: playerResponse.gamesPlayed.reverse(),
-        player: playerResponse.player,
+        gamesPlayed: playerResponse?.gamesPlayed?.reverse(),
+        player: playerResponse?.player,
         lineData: playerEloLineData,
-        opponents: playerResponse.opponents,
+        opponents: playerResponse?.opponents,
         players: playersResponse.sort((a: any, b: any) =>
             a.name.localeCompare(b.name)
         ),

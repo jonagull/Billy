@@ -21,30 +21,30 @@ namespace Billy_BE.Controllers
         {
             try
             {
-                var gamesPlayed = _billyContext.GamesPlayed
-                    .Include(game => game.PlayerOne)
+                var gamesPlayed = _billyContext
+                    .GamesPlayed.Include(game => game.PlayerOne)
                     .Include(game => game.PlayerTwo)
                     .Include(game => game.Winner)
                     .OrderByDescending(game => game.Id) // Order by Id in descending order
-                    .ToList().Take(6);
+                    .ToList()
+                    .Take(6);
 
                 var dto = new List<object>();
 
                 foreach (var game in gamesPlayed)
                 {
-
                     game.PlayerOne.Rating = game.PlayerOneElo;
                     game.PlayerTwo.Rating = game.PlayerTwoElo;
 
-                    var eloChange = CalculateEloChange(game.PlayerOne, game.PlayerTwo, game.Winner.Id);
+                    var eloChange = CalculateEloChange(
+                        game.PlayerOne,
+                        game.PlayerTwo,
+                        game.Winner.Id
+                    );
 
                     game.TimeOfPlay = game.TimeOfPlay.AddHours(1);
 
-                    dto.Add(new
-                    {
-                        game,
-                        eloChange
-                    });
+                    dto.Add(new { game, eloChange });
                 }
 
                 return Ok(dto);
@@ -63,7 +63,7 @@ namespace Billy_BE.Controllers
         //         var gamesPlayed = _billyContext.GamePlayedMultiplePlayers
         //             .OrderByDescending(game => game.Id) // Order by Id in descending order
         //             .ToList();
-        //         
+        //
         //         foreach (var game in gamesPlayed)
         //         {
         //             var player = new List<Player>();
@@ -97,8 +97,8 @@ namespace Billy_BE.Controllers
         [HttpPost("revert/{gameId:int}")]
         public Object RevertLastGame(int gameId)
         {
-            var gameToRevert = _billyContext.GamesPlayed
-                .Include(game => game.PlayerOne)
+            var gameToRevert = _billyContext
+                .GamesPlayed.Include(game => game.PlayerOne)
                 .Include(game => game.PlayerTwo)
                 .Include(game => game.Winner)
                 .FirstOrDefault(game => game.Id == gameId);
@@ -142,6 +142,54 @@ namespace Billy_BE.Controllers
             return Ok();
         }
 
+        // POST: api/Games/RevertGame/{gameId}
+        [HttpPost("RevertGameWithSnapshots/{gameId}")]
+        public async Task<IActionResult> RevertGameWithSnapshots(int gameId)
+        {
+            // Find the game by the provided gameId
+            var game = await _billyContext.GamePlayedMultiplePlayers.FirstOrDefaultAsync(g =>
+                g.Id == gameId
+            );
+
+            if (game == null)
+            {
+                return NotFound("Game not found.");
+            }
+
+            // Get the player snapshots for this game
+            var playerSnapshots = await _billyContext
+                .PlayerSnapshots.Where(s => s.GamePlayedMultiplePlayersId == game.Id)
+                .ToListAsync();
+
+            if (playerSnapshots == null || !playerSnapshots.Any())
+            {
+                return BadRequest("No player snapshots found for the specified game.");
+            }
+
+            // Revert each player's Elo rating
+            foreach (var snapshot in playerSnapshots)
+            {
+                var player = await _billyContext.Players.FindAsync(snapshot.PlayerId);
+                if (player != null)
+                {
+                    player.Rating = snapshot.EloPre; // Revert to the Elo before the game
+                    player.GamesPlayed--;
+                    _billyContext.Players.Update(player);
+                }
+            }
+
+            // Remove the player snapshots associated with the game
+            _billyContext.PlayerSnapshots.RemoveRange(playerSnapshots);
+
+            // Delete the game record itself
+            _billyContext.GamePlayedMultiplePlayers.Remove(game);
+
+            // Save changes
+            await _billyContext.SaveChangesAsync();
+
+            return Ok("Game reverted successfully.");
+        }
+
         [HttpGet]
         public IActionResult GetAllGamesPlayed(int page = 1, int pageSize = 10)
         {
@@ -149,8 +197,8 @@ namespace Billy_BE.Controllers
             {
                 var totalGames = _billyContext.GamesPlayed.Count();
 
-                var gamesPlayed = _billyContext.GamesPlayed
-                    .Include(game => game.PlayerOne)
+                var gamesPlayed = _billyContext
+                    .GamesPlayed.Include(game => game.PlayerOne)
                     .Include(game => game.PlayerTwo)
                     .Include(game => game.Winner)
                     .OrderByDescending(game => game.Id) // Order by Id in descending order
@@ -159,17 +207,14 @@ namespace Billy_BE.Controllers
                     .ToList();
 
                 var gamesWithNames = gamesPlayed
-                    .Select(
-                        game =>
-                            new
-                            {
-                                game.Id,
-                                PlayerOneName = game.PlayerOne.Name,
-                                PlayerTwoName = game.PlayerTwo.Name,
-                                WinnerName = game.Winner.Name,
-                                TimeOfPlay = game.TimeOfPlay.AddHours(1)
-                            }
-                    )
+                    .Select(game => new
+                    {
+                        game.Id,
+                        PlayerOneName = game.PlayerOne.Name,
+                        PlayerTwoName = game.PlayerTwo.Name,
+                        WinnerName = game.Winner.Name,
+                        TimeOfPlay = game.TimeOfPlay.AddHours(1),
+                    })
                     .ToList();
 
                 var response = new
@@ -177,7 +222,7 @@ namespace Billy_BE.Controllers
                     TotalGames = totalGames,
                     PageSize = pageSize,
                     CurrentPage = page,
-                    Games = gamesWithNames
+                    Games = gamesWithNames,
                 };
 
                 return Ok(response);
@@ -187,7 +232,6 @@ namespace Billy_BE.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
 
         private List<ELOPlayer> CalculateEloManyPlayers(List<Player> pla)
         {
@@ -201,14 +245,14 @@ namespace Billy_BE.Controllers
                     place = pla.FindIndex(p => p.Id == player.Id) + 1,
                     eloPre = player.Rating,
                     eloChange = 0,
-                    eloPost = 0
+                    eloPost = 0,
                 };
 
                 players.Add(p);
             }
 
             int n = players.Count();
-            float K = 300 / (float)(n - 1);
+            float K = 32 / (float)(n - 1);
 
             for (int i = 0; i < n; i++)
             {
@@ -232,7 +276,8 @@ namespace Billy_BE.Controllers
                             S = 0.0F;
 
                         //work out EA
-                        float EA = 1 / (1.0f + (float)Math.Pow(10.0f, (opponentELO - curELO) / 400.0f));
+                        float EA =
+                            1 / (1.0f + (float)Math.Pow(10.0f, (opponentELO - curELO) / 400.0f));
 
                         //calculate ELO change vs this one opponent, add it to our change bucket
                         //I currently round at this point, this keeps rounding changes symetrical between EA and EB, but changes K more than it should
@@ -286,25 +331,29 @@ namespace Billy_BE.Controllers
         {
             try
             {
-                var games = await _billyContext.GamePlayedMultiplePlayers
-                    .Include(g => g.PlayerSnapshots)
+                var games = await _billyContext
+                    .GamePlayedMultiplePlayers.Include(g => g.PlayerSnapshots)
                     .ToListAsync();
 
-                var gamesWithSnapshotsDto = games.Select(game => new GameWithSnapshotsDto
-                {
-                    GameId = game.Id,
-                    TimeOfPlay = game.TimeOfPlay,
-                    PlayerSnapshots = game.PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                var gamesWithSnapshotsDto = games
+                    .Select(game => new GameWithSnapshotsDto
                     {
-                        Id = ps.Id,
-                        Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
-                        PlayerId = ps.PlayerId, // assuming there's a PlayerId property
-                        EloChange = ps.EloChange,
-                        EloPre = ps.EloPre,
-                        EloPost = ps.EloPost,
-                        Place = ps.Place
-                    }).ToList()
-                }).ToList();
+                        GameId = game.Id,
+                        TimeOfPlay = game.TimeOfPlay,
+                        PlayerSnapshots = game
+                            .PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                            {
+                                Id = ps.Id,
+                                Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
+                                PlayerId = ps.PlayerId, // assuming there's a PlayerId property
+                                EloChange = ps.EloChange,
+                                EloPre = ps.EloPre,
+                                EloPost = ps.EloPost,
+                                Place = ps.Place,
+                            })
+                            .ToList(),
+                    })
+                    .ToList();
 
                 return Ok(gamesWithSnapshotsDto);
             }
@@ -320,27 +369,31 @@ namespace Billy_BE.Controllers
             try
             {
                 // Fetch games where the given player has snapshots
-                var games = await _billyContext.GamePlayedMultiplePlayers
-                    .Include(g => g.PlayerSnapshots)
+                var games = await _billyContext
+                    .GamePlayedMultiplePlayers.Include(g => g.PlayerSnapshots)
                     .Where(g => g.PlayerSnapshots.Any(ps => ps.PlayerId == playerId)) // Only games where the player participated
                     .ToListAsync();
 
-                var gamesWithSnapshotsDto = games.Select(game => new GameWithSnapshotsDto
-                {
-                    GameId = game.Id,
-                    TimeOfPlay = game.TimeOfPlay,
-                    // Include all player snapshots for each game
-                    PlayerSnapshots = game.PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                var gamesWithSnapshotsDto = games
+                    .Select(game => new GameWithSnapshotsDto
                     {
-                        Id = ps.Id,
-                        Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
-                        PlayerId = ps.PlayerId,
-                        EloChange = ps.EloChange,
-                        EloPre = ps.EloPre,
-                        EloPost = ps.EloPost,
-                        Place = ps.Place
-                    }).ToList()
-                }).ToList();
+                        GameId = game.Id,
+                        TimeOfPlay = game.TimeOfPlay,
+                        // Include all player snapshots for each game
+                        PlayerSnapshots = game
+                            .PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                            {
+                                Id = ps.Id,
+                                Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
+                                PlayerId = ps.PlayerId,
+                                EloChange = ps.EloChange,
+                                EloPre = ps.EloPre,
+                                EloPost = ps.EloPost,
+                                Place = ps.Place,
+                            })
+                            .ToList(),
+                    })
+                    .ToList();
 
                 return Ok(gamesWithSnapshotsDto);
             }
@@ -349,8 +402,6 @@ namespace Billy_BE.Controllers
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
-
-
 
         [HttpPost("multiple")]
         public async Task<IActionResult> LogGameMultiplePlayers(GamePlayedMultipleDto gameDto)
@@ -383,7 +434,7 @@ namespace Billy_BE.Controllers
                         EloChange = calculatedPlayer.eloChange,
                         EloPre = calculatedPlayer.eloPre,
                         EloPost = calculatedPlayer.eloPost,
-                        Place = calculatedPlayer.place
+                        Place = calculatedPlayer.place,
                     };
                     playerSnapshots.Add(snapshot);
                     _billyContext.PlayerSnapshots.Add(snapshot);
@@ -406,8 +457,8 @@ namespace Billy_BE.Controllers
                         snapshot.EloChange,
                         snapshot.EloPre,
                         snapshot.EloPost,
-                        snapshot.Place
-                    })
+                        snapshot.Place,
+                    }),
                 };
 
                 return Ok(response);
@@ -468,7 +519,7 @@ namespace Billy_BE.Controllers
                     PlayerOne = new
                     {
                         NewRating = playerOne.Rating,
-                        RatingDiff = playerOneRatingDiff
+                        RatingDiff = playerOneRatingDiff,
                     },
                     PlayerTwo = new
                     {
@@ -476,7 +527,7 @@ namespace Billy_BE.Controllers
                         RatingDiff = playerTwoRatingDiff,
                     },
 
-                    GameFact = gameFact
+                    GameFact = gameFact,
                 };
 
                 // Return the response as JSON
@@ -532,21 +583,48 @@ namespace Billy_BE.Controllers
             );
         }
 
-        private static EloChange? CalculateEloChange(Player? playerOne, Player? playerTwo, int winnerId)
+        private static EloChange? CalculateEloChange(
+            Player? playerOne,
+            Player? playerTwo,
+            int winnerId
+        )
         {
             const int K = 32; // Elo rating adjustment constant
 
             if (playerTwo == null || playerOne == null)
                 return null;
 
-            var playerOneExpectedScore = 1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
+            var playerOneExpectedScore =
+                1 / (1 + Math.Pow(10, (playerTwo.Rating - playerOne.Rating) / 400.0));
             var playerTwoExpectedScore = 1 - playerOneExpectedScore;
 
             // Calculate the new Elo ratings based on the winner
-            var playerOneNewElo = playerOne.Rating + (int)(K * (winnerId == playerOne.Id ? 1 - playerOneExpectedScore : 0 - playerOneExpectedScore));
-            var playerTwoNewElo = playerTwo.Rating + (int)(K * (winnerId == playerTwo.Id ? 1 - playerTwoExpectedScore : 0 - playerTwoExpectedScore));
+            var playerOneNewElo =
+                playerOne.Rating
+                + (int)(
+                    K
+                    * (
+                        winnerId == playerOne.Id
+                            ? 1 - playerOneExpectedScore
+                            : 0 - playerOneExpectedScore
+                    )
+                );
+            var playerTwoNewElo =
+                playerTwo.Rating
+                + (int)(
+                    K
+                    * (
+                        winnerId == playerTwo.Id
+                            ? 1 - playerTwoExpectedScore
+                            : 0 - playerTwoExpectedScore
+                    )
+                );
 
-            return new EloChange { playerOneNewElo = playerOneNewElo, playerTwoNewElo = playerTwoNewElo };
+            return new EloChange
+            {
+                playerOneNewElo = playerOneNewElo,
+                playerTwoNewElo = playerTwoNewElo,
+            };
         }
 
         private static string GenerateGameFact(Player playerOne, Player playerTwo, int winnerId)
@@ -559,15 +637,16 @@ namespace Billy_BE.Controllers
 
             var gameFact = winnerId switch
             {
-                _ when playerOneLostWinStreak
-                    => $"{playerOne.Name} lost their {playerOneWinStreak} game win streak.",
-                _ when playerTwoLostWinStreak
-                    => $"{playerTwo.Name} lost their {playerTwoWinStreak} game win streak.",
-                _ when winnerId == playerOne.Id && playerOneWinStreak >= 3
-                    => $"{playerOne.Name} won and has a {playerOneWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
-                _ when winnerId == playerTwo.Id && playerTwoWinStreak >= 3
-                    => $"{playerTwo.Name} won and has a  {playerTwoWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
-                _ => $"{(winnerId == playerOne.Id ? playerOne.Name : playerTwo.Name)} won the game."
+                _ when playerOneLostWinStreak =>
+                    $"{playerOne.Name} lost their {playerOneWinStreak} game win streak.",
+                _ when playerTwoLostWinStreak =>
+                    $"{playerTwo.Name} lost their {playerTwoWinStreak} game win streak.",
+                _ when winnerId == playerOne.Id && playerOneWinStreak >= 3 =>
+                    $"{playerOne.Name} won and has a {playerOneWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
+                _ when winnerId == playerTwo.Id && playerTwoWinStreak >= 3 =>
+                    $"{playerTwo.Name} won and has a  {playerTwoWinStreak + 1} game win streak.", // This method runs before the win streak is updated, so we need to add 1 to the win streak
+                _ =>
+                    $"{(winnerId == playerOne.Id ? playerOne.Name : playerTwo.Name)} won the game.",
             };
 
             return gameFact;
@@ -586,7 +665,6 @@ class EloChange
     public int playerOneNewElo { get; set; }
     public int playerTwoNewElo { get; set; }
 }
-
 
 public class ELOPlayer : Player
 {
