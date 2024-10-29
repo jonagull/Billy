@@ -1,4 +1,5 @@
-cd /Users/jonathan/01_code/Billy/backend/Billy-BE
+#cd /Users/jonathan/01_code/Billy/backend/Billy-BE
+cd /Users/jonathan.nodland.gulliksen/code/Billy/backend/Billy-BE
 pwd
 echo $$
 docker -H ssh://root@boi build -t bouvet-boi .

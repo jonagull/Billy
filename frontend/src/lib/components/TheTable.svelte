@@ -36,11 +36,11 @@
     }
 </script>
 
-<Card bordered={false} class="h-[calc(100vh-14rem)] ">
+<Card bordered={false} class="h-[calc(100%)] ">
     <Card.Content
         slot="content"
         class="p-0 sm:p-0"
-        style="height: calc(100% - 64px);"
+        style="height: calc(100% );"
     >
         <Table class="rounded-md overflow-hidden h-full" {columns}>
             <Table.Header
