@@ -55,45 +55,6 @@ namespace Billy_BE.Controllers
             }
         }
 
-        // [HttpGet("multiple")]
-        // public async Task<IActionResult> GetFeedMultiplePlayers()
-        // {
-        //     try
-        //     {
-        //         var gamesPlayed = _billyContext.GamePlayedMultiplePlayers
-        //             .OrderByDescending(game => game.Id) // Order by Id in descending order
-        //             .ToList();
-        //
-        //         foreach (var game in gamesPlayed)
-        //         {
-        //             var player = new List<Player>();
-        //             foreach (var p in game.PlayerIdsJson)
-        //             {
-        //                 var foundPlayer = await _billyContext.Players.FindAsync(p);
-        //
-        //                 if (foundPlayer != null)
-        //                 {
-        //                     player.Add(foundPlayer);
-        //                 }
-        //             }
-        //         }
-        //
-        //         // Transform the list of GamePlayedMultiplePlayers to DTOs
-        //         var dto = gamesPlayed.Select(game => new
-        //         {
-        //             game.Id,
-        //             game.TimeOfPlay,
-        //             game.PlayerIdsJson
-        //         }).ToList();
-        //
-        //         return Ok(dto);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return StatusCode(500, $"An error occurred: {ex.Message}");
-        //     }
-        // }
-
         [HttpPost("revert/{gameId:int}")]
         public Object RevertLastGame(int gameId)
         {
@@ -233,7 +194,8 @@ namespace Billy_BE.Controllers
             }
         }
 
-        private List<ELOPlayer> CalculateEloManyPlayers(List<Player> pla)
+        [NonAction]
+        public List<ELOPlayer> CalculateEloManyPlayers(List<Player> pla)
         {
             var players = new List<ELOPlayer>();
 
@@ -290,7 +252,8 @@ namespace Billy_BE.Controllers
             return players;
         }
 
-        private async void UpdateMetrics(List<ELOPlayer> players)
+        [NonAction]
+        public async void UpdateMetrics(List<ELOPlayer> players)
         {
             foreach (var player in players)
             {
@@ -332,7 +295,7 @@ namespace Billy_BE.Controllers
             try
             {
                 var games = await _billyContext
-                    .GamePlayedMultiplePlayers.Include(g => g.PlayerSnapshots)
+                    .GamePlayedMultiplePlayers.Include(g => g.PlayerSnapshots) // Automatically filtered by TenantId due to global query filter
                     .ToListAsync();
 
                 var gamesWithSnapshotsDto = games
@@ -345,7 +308,7 @@ namespace Billy_BE.Controllers
                             {
                                 Id = ps.Id,
                                 Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
-                                PlayerId = ps.PlayerId, // assuming there's a PlayerId property
+                                PlayerId = ps.PlayerId,
                                 EloChange = ps.EloChange,
                                 EloPre = ps.EloPre,
                                 EloPost = ps.EloPost,
@@ -371,9 +334,17 @@ namespace Billy_BE.Controllers
                 // Fetch games where the given player has snapshots
                 var games = await _billyContext
                     .GamePlayedMultiplePlayers.Include(g => g.PlayerSnapshots)
+                    .ThenInclude(ps => ps.Player) // Eager load Player with PlayerSnapshots
                     .Where(g => g.PlayerSnapshots.Any(ps => ps.PlayerId == playerId)) // Only games where the player participated
                     .ToListAsync();
 
+                // Check if games exist
+                if (games == null || games.Count == 0)
+                {
+                    return NotFound("No games found for the player.");
+                }
+
+                // Map to DTO
                 var gamesWithSnapshotsDto = games
                     .Select(game => new GameWithSnapshotsDto
                     {
@@ -384,7 +355,7 @@ namespace Billy_BE.Controllers
                             .PlayerSnapshots.Select(ps => new PlayerSnapshotDto
                             {
                                 Id = ps.Id,
-                                Name = _billyContext.Players.Find(ps.PlayerId)?.Name,
+                                Name = ps.Player?.Name ?? "Unknown", // Handle null Player case
                                 PlayerId = ps.PlayerId,
                                 EloChange = ps.EloChange,
                                 EloPre = ps.EloPre,
@@ -399,6 +370,72 @@ namespace Billy_BE.Controllers
             }
             catch (Exception ex)
             {
+                // Log the exception (optional)
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
+        [HttpGet("lastGamePlayed")]
+        public async Task<IActionResult> GetLastGamePlayedSnapshots()
+        {
+            try
+            {
+                // Fetch the last game where the player has snapshots, ordered by TimeOfPlay descending
+                var game = await _billyContext
+                    .GamePlayedMultiplePlayers.OrderByDescending(g => g.Id)
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.TimeOfPlay,
+                        PlayerSnapshots = g
+                            .PlayerSnapshots.Select(ps => new
+                            {
+                                ps.Id,
+                                ps.PlayerId,
+                                ps.EloChange,
+                                ps.EloPre,
+                                ps.EloPost,
+                                ps.Place,
+                            })
+                            .ToList(),
+                    })
+                    .FirstOrDefaultAsync(); // Get the first game
+
+                // Check if a game exists
+                if (game == null)
+                {
+                    return NotFound("No games found for the player.");
+                }
+
+                var players = await _billyContext.Players.ToListAsync();
+
+                // Map to DTO
+                var gameWithSnapshotsDto = new GameWithSnapshotsDto
+                {
+                    GameId = game.Id,
+                    TimeOfPlay = game.TimeOfPlay,
+                    // Include all player snapshots for the game
+                    PlayerSnapshots = game
+                        .PlayerSnapshots.Select(ps => new PlayerSnapshotDto
+                        {
+                            Id = ps.Id,
+                            Name = players.Find(p => p.Id == ps.PlayerId)?.Name ?? "Unknown", // Handle null Player case
+                            PlayerId = ps.PlayerId,
+                            EloChange = ps.EloChange,
+                            EloPre = ps.EloPre,
+                            EloPost = ps.EloPost,
+                            Place = ps.Place,
+                        })
+                        .ToList(),
+                };
+
+                return Ok(gameWithSnapshotsDto);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (optional)
+                Console.WriteLine(ex.Message);
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
@@ -408,12 +445,17 @@ namespace Billy_BE.Controllers
         {
             try
             {
+                // Retrieve TenantId from HttpContext.Items
+                if (HttpContext.Items["TenantId"] is not int tenantId)
+                {
+                    return BadRequest("TenantId is missing or invalid.");
+                }
+
                 var players = new List<Player>();
 
                 foreach (int gameDtoPlayerId in gameDto.PlayerIds)
                 {
                     var playerFound = await _billyContext.Players.FindAsync(gameDtoPlayerId);
-
                     if (playerFound != null)
                     {
                         players.Add(playerFound);
@@ -421,14 +463,13 @@ namespace Billy_BE.Controllers
                 }
 
                 var calculatedPlayers = CalculateEloManyPlayers(players);
-                // var calculatedPlayers = Glicko2System.C(players);
-
                 UpdateMetrics(calculatedPlayers);
+
                 var playerSnapshots = new List<PlayerSnapshot>();
 
                 foreach (var calculatedPlayer in calculatedPlayers)
                 {
-                    var snapshot = new PlayerSnapshot()
+                    var snapshot = new PlayerSnapshot
                     {
                         PlayerId = calculatedPlayer.Id,
                         EloChange = calculatedPlayer.eloChange,
@@ -436,17 +477,25 @@ namespace Billy_BE.Controllers
                         EloPost = calculatedPlayer.eloPost,
                         Place = calculatedPlayer.place,
                     };
+
                     playerSnapshots.Add(snapshot);
-                    _billyContext.PlayerSnapshots.Add(snapshot);
-                    await _billyContext.SaveChangesAsync();
                 }
 
-                var game = new GamePlayedMultiplePlayers(playerSnapshots);
+                // Create the game and associate player snapshots with it
+                var game = new GamePlayedMultiplePlayers
+                {
+                    TenantId = tenantId,
+                    PlayerSnapshots = playerSnapshots,
+                    TimeOfPlay = DateTime.UtcNow,
+                };
 
+                // Add the game to the context
                 _billyContext.GamePlayedMultiplePlayers.Add(game);
+
                 // Save changes to the database
                 await _billyContext.SaveChangesAsync();
 
+                // Return the game and player snapshots in the response
                 var response = new
                 {
                     game.Id,

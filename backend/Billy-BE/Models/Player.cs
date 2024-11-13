@@ -3,6 +3,7 @@ namespace Billy_BE.Models
     public class Player
     {
         public int Id { get; set; }
+        public int TenantId { get; set; } // Foreign key to Tenant
         public string Name { get; set; }
         public int Rating { get; set; }
         public int GamesPlayed { get; set; }

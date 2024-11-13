@@ -18,10 +18,18 @@
             dateCreated: new Date().toISOString(),
         };
 
+        const tenantId = window.localStorage.getItem("tenantId");
+
+        if (!tenantId) {
+            console.error("TenantId missing");
+            return;
+        }
+
         fetch(baseUrl + "/Players", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "X-Tenant-ID": tenantId,
             },
             body: JSON.stringify(playerData),
         })

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Billy_BE.Migrations
 {
     [DbContext(typeof(BillyContext))]
-    [Migration("20230821105028_WinStreakMigration")]
-    partial class WinStreakMigration
+    [Migration("20241103095248_AddTenantSupport4")]
+    partial class AddTenantSupport4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,9 @@ namespace Billy_BE.Migrations
                     b.Property<int>("PlayerTwoId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("TimeOfPlay")
                         .HasColumnType("TEXT");
 
@@ -53,6 +56,23 @@ namespace Billy_BE.Migrations
                     b.HasIndex("WinnerId");
 
                     b.ToTable("GamesPlayed");
+                });
+
+            modelBuilder.Entity("Billy_BE.Models.GamePlayedMultiplePlayers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("TimeOfPlay")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GamePlayedMultiplePlayers");
                 });
 
             modelBuilder.Entity("Billy_BE.Models.Player", b =>
@@ -83,6 +103,9 @@ namespace Billy_BE.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Winrate")
                         .HasColumnType("INTEGER");
 
@@ -92,6 +115,61 @@ namespace Billy_BE.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Players");
+                });
+
+            modelBuilder.Entity("Billy_BE.Models.PlayerSnapshot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EloChange")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EloPost")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EloPre")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("GamePlayedMultiplePlayersId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Place")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamePlayedMultiplePlayersId");
+
+                    b.HasIndex("PlayerId");
+
+                    b.ToTable("PlayerSnapshots");
+                });
+
+            modelBuilder.Entity("Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subdomain")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("Billy_BE.Models.GamePlayed", b =>
@@ -119,6 +197,28 @@ namespace Billy_BE.Migrations
                     b.Navigation("PlayerTwo");
 
                     b.Navigation("Winner");
+                });
+
+            modelBuilder.Entity("Billy_BE.Models.PlayerSnapshot", b =>
+                {
+                    b.HasOne("Billy_BE.Models.GamePlayedMultiplePlayers", "GamePlayedMultiplePlayers")
+                        .WithMany("PlayerSnapshots")
+                        .HasForeignKey("GamePlayedMultiplePlayersId");
+
+                    b.HasOne("Billy_BE.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GamePlayedMultiplePlayers");
+
+                    b.Navigation("Player");
+                });
+
+            modelBuilder.Entity("Billy_BE.Models.GamePlayedMultiplePlayers", b =>
+                {
+                    b.Navigation("PlayerSnapshots");
                 });
 #pragma warning restore 612, 618
         }

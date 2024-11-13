@@ -1,20 +1,20 @@
 import { isMultipleTenant } from "$lib/constants";
 import { fetchPageData } from "$lib/helpers/api";
 import type { PlayerEloProgression } from "$lib/interfaces";
+import { handleFetch } from "../../hooks";
 import type { PageLoad } from "./$types";
 
 export const load = (async () => {
-    let data
+    let data;
 
     if (isMultipleTenant) {
-        data = await fetchPageData("players/elosMultiple");
+        data = await handleFetch("/players/elosMultiple");
     } else {
-        data = await fetchPageData("players/elos");
+        data = await handleFetch("/players/elos");
     }
 
-
     if (data.length === 0) {
-        return
+        return;
     }
 
     const players = data.map((x: any) => {

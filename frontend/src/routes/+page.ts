@@ -1,11 +1,11 @@
 import { baseUrl } from "$lib/constants";
+import { handleFetch } from "../hooks";
 import type { PageLoad } from "./$types";
 
 export const load = (async () => {
-    const endpoint = "games/homefeed";
-    const res = await fetch(`${baseUrl}/${endpoint}`);
+    const response = await handleFetch("/games/homefeed");
 
-    const response = await res.json();
+    // const response = await res.json();
 
     return {
         gamesPlayed: response,

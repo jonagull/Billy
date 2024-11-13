@@ -1,0 +1,64 @@
+[
+  {
+    "gameId": 116,
+    "timeOfPlay": "2024-10-06T19:53:09.196346",
+    "playerSnapshots": []
+  },
+  {
+    "gameId": 117,
+    "timeOfPlay": "0001-01-01T00:00:00",
+    "playerSnapshots": [
+      {
+        "id": 263,
+        "name": "asd",
+        "playerId": 16,
+        "eloChange": 15,
+        "eloPre": 1516,
+        "eloPost": 1531,
+        "place": 1
+      },
+      {
+        "id": 264,
+        "name": "asd1",
+        "playerId": 17,
+        "eloChange": -15,
+        "eloPre": 1484,
+        "eloPost": 1469,
+        "place": 2
+      }
+    ]
+  },
+  {
+    "gameId": 118,
+    "timeOfPlay": "0001-01-01T00:00:00",
+    "playerSnapshots": [
+      {
+        "id": 265,
+        "name": "asd",
+        "playerId": 16,
+        "eloChange": 14,
+        "eloPre": 1531,
+        "eloPost": 1545,
+        "place": 1
+      },
+      {
+        "id": 266,
+        "name": "tenant1boi",
+        "playerId": 18,
+        "eloChange": 0,
+        "eloPre": 1500,
+        "eloPost": 1500,
+        "place": 2
+      },
+      {
+        "id": 267,
+        "name": "asd1",
+        "playerId": 17,
+        "eloChange": -14,
+        "eloPre": 1469,
+        "eloPost": 1455,
+        "place": 3
+      }
+    ]
+  }
+]

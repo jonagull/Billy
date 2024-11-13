@@ -35,6 +35,9 @@ namespace Billy_BE.Migrations
                     b.Property<int>("PlayerTwoId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("TimeOfPlay")
                         .HasColumnType("TEXT");
 
@@ -56,6 +59,9 @@ namespace Billy_BE.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TenantId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("TimeOfPlay")
@@ -94,6 +100,9 @@ namespace Billy_BE.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Winrate")
                         .HasColumnType("INTEGER");
 
@@ -129,9 +138,6 @@ namespace Billy_BE.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("SnapshotTime")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GamePlayedMultiplePlayersId");
@@ -139,6 +145,28 @@ namespace Billy_BE.Migrations
                     b.HasIndex("PlayerId");
 
                     b.ToTable("PlayerSnapshots");
+                });
+
+            modelBuilder.Entity("Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subdomain")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tenants");
                 });
 
             modelBuilder.Entity("Billy_BE.Models.GamePlayed", b =>

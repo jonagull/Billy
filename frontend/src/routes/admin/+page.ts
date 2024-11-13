@@ -1,11 +1,15 @@
 import { baseUrl } from "$lib/constants";
-import type { PageLoad } from "./$types";
+import type { PageLoad } from "@sveltejs/kit";
+import { handleFetch } from "../../hooks";
 
-export const load = (async () => {
-    const response = await fetch(`${baseUrl}/players`);
-    const players = await response.json();
+export const load: PageLoad = async ({
+    fetch,
+}: {
+    fetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+}) => {
+    const players = await handleFetch("/players");
 
     return {
-        players: players,
+        players,
     };
-}) satisfies PageLoad;
+};

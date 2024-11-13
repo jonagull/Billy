@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import type { PageData } from "./$types";
+  import ThePlayerCard from "$lib/components/ThePlayerCard.svelte";
 
   export let data: PageData;
 
@@ -29,11 +30,13 @@
 
   onMount(() => {
     playersCopy = data.mappedPlayers;
+    console.log("data", data);
   });
 
   $: selectedPlayerId, addSelectedPlayer(selectedPlayerId);
 
   const addSelectedPlayer = (selectedPlayerId: number) => {
+    debugger;
     if (!selectedPlayerId) {
       return;
     }
@@ -49,6 +52,15 @@
     selectedPlayers.push(selectedPlayer);
     selectedPlayers = selectedPlayers;
     updatePlayerList();
+  };
+
+  const addRecentPlayer = (player: any) => {
+    console.log(player);
+    if (!player) {
+      return;
+    }
+    selectedPlayerId = player.playerId;
+    // addSelectedPlayer(player.id);
   };
 
   const updatePlayerList = () => {
@@ -75,12 +87,38 @@
       return;
     }
 
+    const tenantId = window.localStorage.getItem("tenantId");
+
+    if (!tenantId) {
+      logError = "Tenant ID not found!";
+      showError = true;
+
+      setTimeout(() => {
+        showError = false;
+      }, 7000);
+      return;
+    }
+
+    if (
+      !playersRanking.length ||
+      playersRanking.length !== selectedPlayers.length
+    ) {
+      logError = "You need to place the players!";
+      showError = true;
+
+      setTimeout(() => {
+        showError = false;
+      }, 7000);
+      return;
+    }
+
     try {
       const response = await fetch(baseUrl + "/games/multiple", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+          "X-Tenant-ID": tenantId,
         },
         body: JSON.stringify({ playerIds: playersRanking }),
       });
@@ -393,6 +431,14 @@
     {/each}
   </div>
 
+  <div class="recent-players__wrapper">
+    {#each data.recentPlayers as rp}
+      <button on:click={() => addRecentPlayer(rp)} class="">
+        <ThePlayerCard player={rp} />
+      </button>
+    {/each}
+  </div>
+
   {#if showRevert || isReverting}
     <div class="progress-bar" transition:fade={{ delay: 250, duration: 300 }}>
       <!-- <div class="progress-bar"> -->
@@ -400,26 +446,7 @@
       <TheRevertButton bind:isReverting {gameId} />
     </div>
   {/if}
-
-  <!-- {#if showModal}
-        <TheGameSnapshotsModal
-            bind:this={modalRef}
-            snapshots={playerSnapshots}
-        />
-    {/if} -->
 </div>
-
-<!-- {#if playerSnapshots.length > 0} -->
-<!-- <dialog
-    class="dialog relative w-full max-w-md max-h-full rounded"
-    bind:this={dialog}
->
-    {#each playerSnapshots as p}
-        <p in:fade>{p.name}</p>
-    {/each}
-</dialog> -->
-
-<!-- {/if} -->
 
 <style lang="scss">
   .progress-bar {

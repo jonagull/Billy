@@ -1,51 +1,51 @@
-import { baseUrl, isMultipleTenant } from "$lib/constants";
-import { fetchPageData } from "$lib/helpers/api";
+import { isMultipleTenant } from "$lib/constants";
 import type { Player, PlayerProfile } from "$lib/interfaces";
+import { handleFetch } from "../../../hooks";
 import type { PageLoad } from "./$types";
 
-export const load = (async ({ params }) => {
+export const load = (async ({ params, fetch }) => {
     let playerResponse: PlayerProfile | null = null;
-    
+    // const playerId = window.localStorage.getItem("playerId");
+
+    // console.log(playerId);
+
     if (isMultipleTenant) {
-        playerResponse  = await fetchPageData(
-            "Players/" + params.id + "/multiple"
+        playerResponse = await handleFetch(
+            "/Players/" + params.id + "/multiple"
         );
     } else {
-        playerResponse  = await fetchPageData(
-            "Players/" + params.id
-        );
+        playerResponse = await handleFetch("/Players/" + params.id);
     }
-
 
     let playerGameElos: number[] | null = [];
     let playerGamesWithSnapshots = [];
 
-    const playersResponse: Player[] = await fetchPageData("Players");
+    const playersResponse: Player[] = await handleFetch("/Players");
 
     if (!isMultipleTenant) {
         if (playerResponse && playerResponse.gamesPlayed.length === 0) {
             return;
         }
 
-        playerGameElos = playerResponse?.gamesPlayed.map((x) =>
-            x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
-        ) ?? [];
+        playerGameElos =
+            playerResponse?.gamesPlayed.map((x) =>
+                x.playerOne.id === +params.id ? x.playerOneElo : x.playerTwoElo
+            ) ?? [];
 
         playerGameElos.push(playerResponse?.player.rating ?? 0);
     }
 
     if (isMultipleTenant) {
-        const playerElos = await fetch(
-            `${baseUrl}/Players/player/${params.id}/elo-history`
+        const playerElos = await handleFetch(
+            `/Players/player/${params.id}/elo-history`
         );
-        playerGameElos = await playerElos.json();
+        playerGameElos = playerElos;
 
-        const playerGamesPlayedWithSnapshotsResponse = await fetch(
-            `${baseUrl}/Games/multiple/${params.id}`
+        const playerElosMultiple = await handleFetch(
+            `/Games/multiple/${params.id}`
         );
 
-        playerGamesWithSnapshots =
-            await playerGamesPlayedWithSnapshotsResponse.json();
+        playerGamesWithSnapshots = playerElosMultiple;
     }
 
     const playerGameLabels = playerGameElos?.map((_, index) => index);

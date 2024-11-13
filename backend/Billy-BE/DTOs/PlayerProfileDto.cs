@@ -7,6 +7,7 @@ public class PlayerProfileDto
     public Player Player { get; set; }
     public List<GamePlayed> GamesPlayed { get; set; }
     public List<Opponent>? Opponents { get; set; }
+    public List<GamePlayedMultiplePlayers?> GamesPlayedMultiple { get; internal set; }
 }
 
 public class Opponent

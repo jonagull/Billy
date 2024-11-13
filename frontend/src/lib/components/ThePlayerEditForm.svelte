@@ -17,11 +17,19 @@
 
     // Function to handle form submission
     const handleSubmit = async () => {
+        const tenantId = window.localStorage.getItem("tenantId");
+
+        if (!tenantId) {
+            console.error("No tenantId");
+            return;
+        }
+
         const response = await fetch(baseUrl + "/players/" + player.id, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
+                "X-Tenant-ID": tenantId, // Custom header for tenant ID
             },
             body: JSON.stringify(player),
         });
