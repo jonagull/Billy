@@ -68,7 +68,14 @@
     if (playersRanking.length == 1) {
       logError = "You need at least two players to log a game!";
       showError = true;
+    }
 
+    if (selectedPlayers.length !== playersRanking.length) {
+      logError = "You need to rank all players!";
+      showError = true;
+    }
+
+    if (showError) {
       setTimeout(() => {
         showError = false;
       }, 7000);
